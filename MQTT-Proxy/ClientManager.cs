@@ -11,9 +11,9 @@ namespace MQTT_Client
     class ClientManager
     {
         //Broker to Target
-        Client clientOut;
+        public Client clientOut;
         //Target answer to broker
-        Client clientIn;
+        public Client clientIn;
 
         public ClientManager(String clientId, ProxyConfig proxyConfig)
         {

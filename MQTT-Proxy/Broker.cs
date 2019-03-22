@@ -35,17 +35,17 @@ namespace MQTT_Client
             mqttServer.ClientConnected += MqttServer_ClientConnected;
         }
 
-        public async void CreateBroker()
+        public async void Start()
         {
             await mqttServer.StartAsync(optionsBuilder);
+            Console.WriteLine("Broker started.");
             //await mqttServer.StopAsync();
         }
 
         private void MqttServer_ClientConnected(object sender, MqttClientConnectedEventArgs e)
         {
             // fo not create clientmanager for connecting fakeClient
-            if (e.ClientId.EndsWith("_fake"))
-                return;
+            if (e.ClientId.EndsWith("_fake")) return;
 
             if (clientManagers.ContainsKey(e.ClientId))
             {
@@ -58,7 +58,12 @@ namespace MQTT_Client
         }
 
         // Extend the timestamp for all messages from clients.
-        public void HandleMessage (MqttApplicationMessageInterceptorContext context){}
+        public async void HandleMessage (MqttApplicationMessageInterceptorContext context){
+            if (context.ClientId.EndsWith("_fake")) return;
+
+            context.AcceptPublish = false;
+            await clientManagers[context.ClientId].clientOut.SendMessage(context.ApplicationMessage.Payload, context.ApplicationMessage.Topic);
+        }
 
         // Protect several topics from being subscribed from every client.
         public void HandleMessage(MqttSubscriptionInterceptorContext context){}

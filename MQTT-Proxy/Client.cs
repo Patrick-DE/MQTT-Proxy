@@ -55,6 +55,16 @@ namespace MQTT_Client
             await mqttClient.PublishAsync(message);
         }
 
+        public async Task SendMessage(byte[] msg, string topic)
+        {
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(msg)
+                .Build();
+
+            await mqttClient.PublishAsync(message);
+        }
+
         public event EventHandler<MqttApplicationMessageReceivedEventArgs> ApplicationMessageReceived;
         public event EventHandler<MqttClientConnectedEventArgs> Connected;
 
