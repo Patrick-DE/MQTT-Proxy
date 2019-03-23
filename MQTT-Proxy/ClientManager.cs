@@ -39,9 +39,10 @@ namespace MQTT_Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void onOutMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
+        public async void onOutMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
             //send to clientIn
+            await clientOut.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
         }
 
         /// <summary>
@@ -49,9 +50,10 @@ namespace MQTT_Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void onInMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
+        public async void onInMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
             //send to proxyBroker
+            await clientIn.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
         }
 
         /// <summary>
@@ -61,7 +63,7 @@ namespace MQTT_Client
         /// <param name="e"></param>
         public void onConnected(object sender, MqttClientConnectedEventArgs e)
         {
-            
+            Console.WriteLine("Client connected!");
         }
     }
 }

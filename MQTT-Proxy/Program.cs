@@ -10,6 +10,7 @@ namespace MQTT_Client
     {
         static void Main(string[] args)
         {
+                              //"String ownIP, int ownPort, String targetIP, int targetPort"
             args = new string[] { "192.168.1.21", "1883", "192.168.1.41", "1883" };
 
             if (args.Length < 4)

@@ -79,7 +79,7 @@ namespace MQTT_Client
             ApplicationMessageReceived?.Invoke(this,e);
         }
 
-        private async void MqttClient_Connected(object sender, MqttClientConnectedEventArgs e)
+        private void MqttClient_Connected(object sender, MqttClientConnectedEventArgs e)
         {
             Console.WriteLine("### CLIENT CONNECTED ###");
             Connected?.Invoke(this, e);
