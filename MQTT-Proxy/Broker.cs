@@ -66,6 +66,10 @@ namespace MQTT_Client
         }
 
         // Protect several topics from being subscribed from every client.
-        public void HandleMessage(MqttSubscriptionInterceptorContext context){}
+        public async void HandleMessage(MqttSubscriptionInterceptorContext context) {
+            if (context.ClientId.EndsWith("_fake")) return;
+
+            await clientManagers[context.ClientId].clientOut.SubscribeTo(context.TopicFilter.Topic);
+        }
     }
 }

@@ -25,7 +25,9 @@ namespace MQTT_Client
             clientIn.ApplicationMessageReceived += onOutMessageReceived;
             clientIn.Connected += onConnected;
         }
-
+        /// <summary>
+        /// Connect both clients for communicating to the targetBroker and providing the answer to proxyBroker
+        /// </summary>
         public void Connect()
         {
             clientOut.Connect();

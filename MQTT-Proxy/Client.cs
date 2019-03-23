@@ -38,11 +38,11 @@ namespace MQTT_Client
             await mqttClient.ConnectAsync(options);
         }
 
-        public async void SubscribeTo(String topic)
+        public async Task SubscribeTo(String topic)
         {
             // Subscribe to a topic
+            Console.WriteLine("### SUBSCRIBING TO " + topic.ToUpper() + " ###");
             await mqttClient.SubscribeAsync(new TopicFilterBuilder().WithTopic(topic).Build());
-            Console.WriteLine("### SUBSCRIBED TO " + topic.ToUpper() + " ###");
         }
 
         public async Task SendMessage(string msg, string topic)
