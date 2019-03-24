@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MQTT_Client
@@ -18,42 +19,55 @@ namespace MQTT_Client
         public ClientManager(String clientId, ProxyConfig proxyConfig)
         {
             clientOut = new ClientOut(proxyConfig.targetIP, proxyConfig.targetPort, clientId);
-            clientOut.ApplicationMessageReceived += onInMessageReceived;
+            clientOut.ApplicationMessageReceived += onOutMessageReceived;
             clientOut.Connected += onConnected;
 
             clientIn = new ClientIn(proxyConfig.ownIP, proxyConfig.ownPort, clientId + "_fake");
-            clientIn.ApplicationMessageReceived += onOutMessageReceived;
+            clientIn.ApplicationMessageReceived += onInMessageReceived;
             clientIn.Connected += onConnected;
         }
         /// <summary>
         /// Connect both clients for communicating to the targetBroker and providing the answer to proxyBroker
         /// </summary>
-        public void Connect()
+        public async Task Connect()
         {
-            clientOut.Connect();
-            clientIn.Connect();
+            Console.WriteLine("ClientManager: Connecting clientOut");
+            while (!clientOut.IsConnected())
+            {
+                await clientOut.Connect();
+                System.Threading.Thread.Sleep(100);
+            }
+            Console.WriteLine("ClientManager: Connecting clientIn");
+            while (!clientIn.IsConnected())
+            {
+                await clientIn.Connect();
+                System.Threading.Thread.Sleep(100);
+            }
         }
 
         /// <summary>
-        /// Event is triggered if message from targetBroker is received 
+        /// Event is triggered if answer from targetBroker is received 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public async void onOutMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
-            //send to clientIn
-            await clientOut.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
+            //send message via clientIn
+            Console.WriteLine("ClientManager: Message received from proxy - sending with ClientIn to proxyBroker");
+            while (!clientIn.IsConnected())
+                Thread.Sleep(100);
+            await clientIn.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
+            Console.WriteLine("ClientManager: Message send via ClientIn to proxyBroker");
         }
 
         /// <summary>
-        /// Event is triggered if message from clientOut is received 
+        /// Event is triggered if answer from Proxy is received 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public async void onInMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
-            //send to proxyBroker
-            await clientIn.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
+            //dont care about responses from proxyBroker
         }
 
         /// <summary>

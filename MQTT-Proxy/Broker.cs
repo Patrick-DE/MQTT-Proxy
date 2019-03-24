@@ -42,9 +42,11 @@ namespace MQTT_Client
             //await mqttServer.StopAsync();
         }
 
-        private void MqttServer_ClientConnected(object sender, MqttClientConnectedEventArgs e)
+        private async void MqttServer_ClientConnected(object sender, MqttClientConnectedEventArgs e)
         {
-            // fo not create clientmanager for connecting fakeClient
+            Console.WriteLine("Broker: ClientConnected");
+            
+            // do not create clientmanager for connecting fakeClient
             if (e.ClientId.EndsWith("_fake")) return;
 
             if (clientManagers.ContainsKey(e.ClientId))
@@ -53,23 +55,45 @@ namespace MQTT_Client
             }
             else
             {
+                Console.WriteLine("Broker: Creating new ClientManager");
                 clientManagers[e.ClientId] = new MQTT_Client.ClientManager(e.ClientId, proxyConfig);
+                Console.WriteLine("Broker: ClientManager created");
+                Console.WriteLine("Broker: Connecting ClientManager");
+                await clientManagers[e.ClientId].Connect();
+                Console.WriteLine("Broker: ClientManager connected");
             }
         }
 
         // Extend the timestamp for all messages from clients.
         public async void HandleMessage (MqttApplicationMessageInterceptorContext context){
+            Console.WriteLine("Broker: New message");
+
             if (context.ClientId.EndsWith("_fake")) return;
 
             context.AcceptPublish = false;
-            await clientManagers[context.ClientId].clientOut.SendMessage(context.ApplicationMessage.Payload, context.ApplicationMessage.Topic);
+            if (clientManagers[context.ClientId].clientOut.IsConnected())
+            {
+                Console.WriteLine("Broker: Sending msg via ClientOut");
+                await clientManagers[context.ClientId].clientOut.SendMessage(context.ApplicationMessage.Payload, context.ApplicationMessage.Topic);
+                Console.WriteLine("Broker: Message send via ClientOut");
+            }
+            else
+            {
+                Console.WriteLine("Broker: ClientOut not connected!!!");
+            }
         }
 
         // Protect several topics from being subscribed from every client.
         public async void HandleMessage(MqttSubscriptionInterceptorContext context) {
+            Console.WriteLine("Broker: Subscription detected");
             if (context.ClientId.EndsWith("_fake")) return;
 
+            Console.WriteLine("Broker: ClientOut subscribing");
+            while (!clientManagers[context.ClientId].clientOut.IsConnected())
+                Thread.Sleep(100);
+
             await clientManagers[context.ClientId].clientOut.SubscribeTo(context.TopicFilter.Topic);
+            Console.WriteLine("Broker: ClientOut subscribed");
         }
     }
 }

@@ -12,10 +12,5 @@ namespace MQTT_Client
     public class ClientIn : Client
     {
         public ClientIn(String ip, int port, String clientId) : base(ip, port, clientId) { }
-
-
-
-
-
     }
 }
