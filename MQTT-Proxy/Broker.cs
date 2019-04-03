@@ -70,12 +70,20 @@ namespace MQTT_Client
 
             if (context.ClientId.EndsWith("_fake")) return;
 
+            Console.WriteLine("### BROKER: RECEIVED APPLICATION MESSAGE ###");
+            Console.WriteLine($"+ Topic = {context.ApplicationMessage.Topic}");
+            Console.WriteLine($"+ Payload = {Encoding.UTF8.GetString(context.ApplicationMessage.Payload)}");
+            Console.WriteLine($"+ QoS = {context.ApplicationMessage.QualityOfServiceLevel}");
+            Console.WriteLine($"+ Retain = {context.ApplicationMessage.Retain}");
+            Console.WriteLine();
+
             context.AcceptPublish = false;
             if (clientManagers[context.ClientId].clientOut.IsConnected())
             {
                 Console.WriteLine("Broker: Sending msg via ClientOut");
-                await clientManagers[context.ClientId].clientOut.SendMessage(context.ApplicationMessage.Payload, context.ApplicationMessage.Topic);
-                Console.WriteLine("Broker: Message send via ClientOut");
+                string tmp = Encoding.UTF8.GetString(context.ApplicationMessage.Payload)+DateTime.Now.Ticks.ToString();
+                await clientManagers[context.ClientId].clientOut.SendMessage(Encoding.UTF8.GetBytes(tmp), context.ApplicationMessage.Topic);
+                Console.WriteLine("Broker: Message sent via ClientOut");
             }
             else
             {

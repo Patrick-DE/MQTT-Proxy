@@ -57,7 +57,7 @@ namespace MQTT_Client
             while (!clientIn.IsConnected())
                 Thread.Sleep(100);
             await clientIn.SendMessage(e.ApplicationMessage.Payload, e.ApplicationMessage.Topic);
-            Console.WriteLine("ClientManager: Message send via ClientIn to proxyBroker");
+            Console.WriteLine("ClientManager: Message sent via ClientIn to proxyBroker");
         }
 
         /// <summary>

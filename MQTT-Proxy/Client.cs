@@ -41,7 +41,7 @@ namespace MQTT_Client
         public async Task Connect()
         {
             Console.WriteLine("Client: Client connecting");
-            MqttClientConnectResult connected = null;
+            /*MqttClientConnectResult connected = null;
             do
             {
                 Console.WriteLine("Try to connect");
@@ -55,7 +55,13 @@ namespace MQTT_Client
                     //broker is awaiting so ClientIn not able to connect!
                     //throw new Exception("TargetBroker is not available.");
                 }
-            } while (!mqttClient.IsConnected);
+            } while (!mqttClient.IsConnected);*/
+            try { 
+                await mqttClient.ConnectAsync(options);
+            }catch (Exception e)
+            {
+                //broker is awaiting so ClientIn not able to connect!
+            }
             Console.WriteLine("Client: Client connected "+ mqttClient.IsConnected.ToString());
         }
 
@@ -97,7 +103,7 @@ namespace MQTT_Client
 
         private void MqttClient_ApplicationMessageReceived(object sender, MqttApplicationMessageReceivedEventArgs e)
         {
-            Console.WriteLine("### RECEIVED APPLICATION MESSAGE ###");
+            Console.WriteLine("### " + e.ClientId + " RECEIVED APPLICATION MESSAGE ###");
             Console.WriteLine($"+ Topic = {e.ApplicationMessage.Topic}");
             Console.WriteLine($"+ Payload = {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
             Console.WriteLine($"+ QoS = {e.ApplicationMessage.QualityOfServiceLevel}");
