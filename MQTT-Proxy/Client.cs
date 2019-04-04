@@ -12,12 +12,14 @@ namespace MQTT_Proxy
     public class Client
     {
         protected IMqttClient mqttClient;
-        protected bool run = true;
-
-        private IMqttClientOptions options;
+        //should be protected, public for serialize
+        public bool run { get; set; }
+        //should be private, public for serialize
+        public IMqttClientOptions options { get; }
 
         public Client(String ip, int port, String clientId)
         {
+            run = true;
             // Create a new MQTT client.
             var factory = new MqttFactory();
             mqttClient = factory.CreateMqttClient();

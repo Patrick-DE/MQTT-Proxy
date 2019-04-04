@@ -65,6 +65,7 @@
     <Compile Include="ProxyConfig.cs" />
     <Compile Include="REST\Client.cs" />
     <Compile Include="REST\Authentication.cs" />
+    <Compile Include="REST\ClientManagerWithMessages.cs" />
     <Compile Include="REST\Message.cs" />
     <Compile Include="REST\RESTExtention.cs" />
   </ItemGroup>
