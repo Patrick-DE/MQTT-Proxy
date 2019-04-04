@@ -34,7 +34,9 @@ namespace MQTT_Proxy
                 msg.Payload = Encoding.UTF8.GetBytes("YourMomGay" + rnd.Next(0, 1000));
                 msg.Topic = "YourMomDoubleGay";
                 msg.Retain = false;
-                Broker.db.messageList.Add(new MQTTProxyMessage(msg, "clientId" + rnd.Next(0, 1000)));
+                string clientId = "clientId" + rnd.Next(0, 1000);
+                Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId));
+                Broker.clientManagers.Add("clientManger-"+ rnd.Next(0,1000), new ClientManager(clientId, proxyConfig));
             }
             //END DUMMY SHIT!!
 

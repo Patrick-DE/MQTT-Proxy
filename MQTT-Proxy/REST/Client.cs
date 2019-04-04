@@ -13,32 +13,49 @@ namespace MQTT_Proxy.REST
     [RestResource(BasePath = "/client")]
     class Client
     {
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/")]
         public IHttpContext GetAllClientManager(IHttpContext context)
         {
-            context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.ServiceUnavailable, new NotImplementedException());
+            context.Response.SendJSON(Broker.clientManagers);
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[clientId]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[clientId]")]
         public IHttpContext GetClientManagerInfo(IHttpContext context)
         {
             Console.WriteLine(context.Request.PathParameters["clientId"]);
-            string clientid = context.Request.PathParameters["clientId"];
-            context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.ServiceUnavailable, new NotImplementedException());
+            string clientId = context.Request.PathParameters["clientId"];
+            if (clientId == "" || Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == false)
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
+            else
+                context.Response.SendJSON(Broker.clientManagers[clientId]);
+
             return context;
         }
 
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[clientId]")]
         public IHttpContext UpdateClientManager(IHttpContext context)
         {
-            Console.WriteLine(context.Request.PathParameters["clientId"]);
-            string clientid = context.Request.PathParameters["clientId"];
-            context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.ServiceUnavailable, new NotImplementedException());
+            bool.TryParse(context.Request.PathParameters["intercept"], out bool intercept);
+            if (!intercept)
+            {
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid value for 'intercept'");
+            }
+            else
+            {
+                Console.WriteLine(context.Request.PathParameters["clientId"]);
+                string clientId = context.Request.PathParameters["clientId"];
+                if (clientId == "" || Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == false) 
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
+                else {
+                    Broker.clientManagers[clientId].intercept = intercept;
+                    context.Response.SendJSON(Broker.clientManagers[clientId]);
+                }
+            }
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[clientId]/[msgId]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[clientId]/[msgId]")]
         public IHttpContext GetMessagesOfClientManagers(IHttpContext context)
         {
             Console.WriteLine(context.Request.PathParameters["clientId"]);

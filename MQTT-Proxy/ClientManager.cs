@@ -1,5 +1,6 @@
 ﻿using MQTTnet;
 using MQTTnet.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,23 @@ namespace MQTT_Proxy
     class ClientManager
     {
         //Broker to Target
+        [JsonIgnore]
         public Client clientOut;
         //Target answer to broker
+        [JsonIgnore]
         public Client clientIn;
+        public String clientId;
         public bool intercept = false;
+        public List<MQTTProxyMessage> messages
+        {
+            get { return Broker.db.messageList.Where(i => i.ClientId == clientId).ToList(); }
+            private set {;}
+        }
 
         public ClientManager(String clientId, ProxyConfig proxyConfig)
         {
+            messages = new List<MQTTProxyMessage>();
+            this.clientId = clientId;
             clientOut = new ClientOut(proxyConfig.targetIP, proxyConfig.targetPort, clientId);
             clientOut.ApplicationMessageReceived += onOutMessageReceived;
             clientOut.Connected += onConnected;
@@ -27,6 +38,8 @@ namespace MQTT_Proxy
             clientIn.ApplicationMessageReceived += onInMessageReceived;
             clientIn.Connected += onConnected;
         }
+
+
         /// <summary>
         /// Connect both clients for communicating to the targetBroker and providing the answer to proxyBroker
         /// </summary>
