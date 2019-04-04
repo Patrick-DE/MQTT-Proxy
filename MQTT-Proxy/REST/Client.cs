@@ -94,7 +94,7 @@ namespace MQTT_Proxy.REST
                 MqttApplicationMessage msg = new MqttApplicationMessage();
                 msg.Payload = Encoding.UTF8.GetBytes(context.Request.QueryString["Payload"]);
                 msg.Topic = context.Request.QueryString["Topic"];
-                msg.QualityOfServiceLevel = (MQTTnet.Protocol.MqttQualityOfServiceLevel)QoS);
+                msg.QualityOfServiceLevel = (MQTTnet.Protocol.MqttQualityOfServiceLevel)QoS;
                 msg.Retain = retain;
                 Broker.clientManagers[clientId].clientOut.SendMessage(msg);
             }
