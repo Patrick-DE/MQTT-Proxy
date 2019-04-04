@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MQTT_Client
+namespace MQTT_Proxy
 {
     public class Client
     {
@@ -41,21 +41,6 @@ namespace MQTT_Client
         public async Task Connect()
         {
             Console.WriteLine("Client: Client connecting");
-            /*MqttClientConnectResult connected = null;
-            do
-            {
-                Console.WriteLine("Try to connect");
-                Thread.Sleep(100);
-                try
-                {
-                    connected = await mqttClient.ConnectAsync(options);
-                }
-                catch (Exception e)
-                {
-                    //broker is awaiting so ClientIn not able to connect!
-                    //throw new Exception("TargetBroker is not available.");
-                }
-            } while (!mqttClient.IsConnected);*/
             try { 
                 await mqttClient.ConnectAsync(options);
             }catch (Exception e)
@@ -87,10 +72,24 @@ namespace MQTT_Client
 
         public async Task SendMessage(byte[] msg, string topic)
         {
-            Console.WriteLine("Client: Sendin byte message");
+            Console.WriteLine("Client: Sending byte message");
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
                 .WithPayload(msg)
+                .Build();
+
+            await mqttClient.PublishAsync(message);
+            Console.WriteLine("Client: Message byte send");
+        }
+
+        public async Task SendMessage(MqttApplicationMessage msg)
+        {
+            Console.WriteLine("Client: Sending MqttApplicationMessage");
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(msg.Topic)
+                .WithPayload(msg.Payload)
+                .WithQualityOfServiceLevel(msg.QualityOfServiceLevel)
+                .WithRetainFlag(msg.Retain)
                 .Build();
 
             await mqttClient.PublishAsync(message);

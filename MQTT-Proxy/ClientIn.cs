@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MQTT_Client
+namespace MQTT_Proxy
 {
     public class ClientIn : Client
     {

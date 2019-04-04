@@ -1,4 +1,4 @@
-﻿using MQTT_Client;
+﻿using MQTT_Proxy;
 using MQTTnet;
 using MQTTnet.Server;
 using System;
@@ -9,18 +9,20 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace MQTT_Client
+namespace MQTT_Proxy
 {
     class Broker
     {
         IMqttServer mqttServer;
-        Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
+        public static Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
         ProxyConfig proxyConfig;
+        public static EzDatabase db;
 
         private IMqttServerOptions optionsBuilder;
 
         public Broker(ProxyConfig proxyConfig)
         {
+            db = new EzDatabase();
             this.proxyConfig = proxyConfig;
             // Start a MQTT server.
             optionsBuilder = new MqttServerOptionsBuilder()
@@ -56,7 +58,7 @@ namespace MQTT_Client
             else
             {
                 Console.WriteLine("Broker: Creating new ClientManager");
-                clientManagers[e.ClientId] = new MQTT_Client.ClientManager(e.ClientId, proxyConfig);
+                clientManagers[e.ClientId] = new MQTT_Proxy.ClientManager(e.ClientId, proxyConfig);
                 Console.WriteLine("Broker: ClientManager created");
                 Console.WriteLine("Broker: Connecting ClientManager");
                 await clientManagers[e.ClientId].Connect();
@@ -78,16 +80,15 @@ namespace MQTT_Client
             Console.WriteLine();
 
             context.AcceptPublish = false;
-            if (clientManagers[context.ClientId].clientOut.IsConnected())
+
+            //If intercept on save msg
+            if (clientManagers[context.ClientId].intercept)
             {
-                Console.WriteLine("Broker: Sending msg via ClientOut");
-                string tmp = Encoding.UTF8.GetString(context.ApplicationMessage.Payload)+DateTime.Now.Ticks.ToString();
-                await clientManagers[context.ClientId].clientOut.SendMessage(Encoding.UTF8.GetBytes(tmp), context.ApplicationMessage.Topic);
-                Console.WriteLine("Broker: Message sent via ClientOut");
+                db.messageList.Add(new MQTTProxyMessage(context.ApplicationMessage, context.ClientId));
             }
-            else
-            {
-                Console.WriteLine("Broker: ClientOut not connected!!!");
+            //if intercept off forward
+            else {
+                ForwardMessage(context);
             }
         }
 
@@ -102,6 +103,21 @@ namespace MQTT_Client
 
             await clientManagers[context.ClientId].clientOut.SubscribeTo(context.TopicFilter.Topic);
             Console.WriteLine("Broker: ClientOut subscribed");
+        }
+
+        public async void ForwardMessage(MqttApplicationMessageInterceptorContext context)
+        {
+            if (clientManagers[context.ClientId].clientOut.IsConnected())
+            {
+                Console.WriteLine("Broker: Sending msg via ClientOut");
+                string tmp = Encoding.UTF8.GetString(context.ApplicationMessage.Payload) + DateTime.Now.Ticks.ToString();
+                await clientManagers[context.ClientId].clientOut.SendMessage(Encoding.UTF8.GetBytes(tmp), context.ApplicationMessage.Topic);
+                Console.WriteLine("Broker: Message sent via ClientOut");
+            }
+            else
+            {
+                Console.WriteLine("Broker: ClientOut not connected!!!");
+            }
         }
     }
 }

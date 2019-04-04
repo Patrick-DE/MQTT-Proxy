@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MQTT_Client
+namespace MQTT_Proxy
 {
     class ClientManager
     {
@@ -15,6 +15,7 @@ namespace MQTT_Client
         public Client clientOut;
         //Target answer to broker
         public Client clientIn;
+        public bool intercept = false;
 
         public ClientManager(String clientId, ProxyConfig proxyConfig)
         {
