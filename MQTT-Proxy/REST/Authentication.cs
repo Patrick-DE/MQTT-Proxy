@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MQTT_Proxy.REST
 {
-    [RestResource(BasePath = "/auth")]
+    [RestResource(BasePath = "/api/auth")]
     class Authentication
     {
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/status")]

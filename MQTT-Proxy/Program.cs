@@ -3,6 +3,7 @@ using MQTTnet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,10 @@ namespace MQTT_Proxy
         {
                               //"String ownIP, int ownPort, String targetIP, int targetPort"
             args = new string[] { "192.168.1.21", "1883", "192.169.178.120", "1883" };
+            args[0] = Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList
+                .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                .ToString();
 
             if (args.Length < 4)
             {
@@ -50,9 +55,10 @@ namespace MQTT_Proxy
 
             var rest = new RestServer
             {
-                Host = "192.168.1.21",
-                Port = "8080",
-                PublicFolder = new PublicFolder("public")
+                Host = args[0],
+                Port = "80",
+                PublicFolder = new PublicFolder("public"),
+                
             };
             rest.Start();
 

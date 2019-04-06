@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MQTT_Proxy.REST
 {
-    [RestResource(BasePath = "/intercept")]
+    [RestResource(BasePath = "/api/intercept")]
     class Intercepter
     {
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[msgId]/accept")]

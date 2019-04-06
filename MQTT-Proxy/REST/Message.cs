@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace MQTT_Proxy.REST
 {
-    [RestResource(BasePath = "/message")]
+    [RestResource(BasePath = "/api/message")]
     class Message
     {
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/all")]
         public IHttpContext GetAllMessages(IHttpContext context)
         {
             context.Response.SendJSON(Broker.db.messageList);

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MQTT_Proxy.REST
 {
-    [RestResource(BasePath = "/manager")]
+    [RestResource(BasePath = "/api/manager")]
     class Manager
     {
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/all")]
