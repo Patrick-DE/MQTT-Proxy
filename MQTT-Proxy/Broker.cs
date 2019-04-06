@@ -84,7 +84,7 @@ namespace MQTT_Proxy
             //If intercept on save msg
             if (clientManagers[context.ClientId].intercept)
             {
-                db.messageList.Add(new MQTTProxyMessage(context.ApplicationMessage, context.ClientId));
+                db.messageList.Add(new MQTTProxyMessage(context.ApplicationMessage, context.ClientId, MessageState.Intercepted));
             }
             //if intercept off forward
             else {

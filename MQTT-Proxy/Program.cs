@@ -37,12 +37,12 @@ namespace MQTT_Proxy
                 if (i == 0)
                 {
                     string clientId = "clientId";
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId));
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
                     Broker.clientManagers.Add("clientManger", new ClientManager(clientId, proxyConfig));
                 }
                 else { 
                     string clientId = "clientId" + rnd.Next(0, 1000);
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId));
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
                     Broker.clientManagers.Add("clientManger-"+ rnd.Next(0,1000), new ClientManager(clientId, proxyConfig));
                 }
             }
@@ -50,8 +50,9 @@ namespace MQTT_Proxy
 
             var rest = new RestServer
             {
-                Host = "localhost",
-                Port = "8080"
+                Host = "192.168.1.21",
+                Port = "8080",
+                PublicFolder = new PublicFolder("public")
             };
             rest.Start();
 

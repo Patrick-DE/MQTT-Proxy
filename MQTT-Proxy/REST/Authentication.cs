@@ -33,7 +33,7 @@ namespace MQTT_Proxy.REST
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/pass")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/pwd")]
         public IHttpContext ChangePassword(IHttpContext context)
         {
             //check if old password same then replace with new one

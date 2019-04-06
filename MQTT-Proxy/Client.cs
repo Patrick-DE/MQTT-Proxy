@@ -45,7 +45,7 @@ namespace MQTT_Proxy
             Console.WriteLine("Client: Client connecting");
             try { 
                 await mqttClient.ConnectAsync(options);
-            }catch (Exception e)
+            }catch (Exception)
             {
                 //broker is awaiting so ClientIn not able to connect!
             }

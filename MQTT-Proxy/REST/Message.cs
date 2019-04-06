@@ -22,10 +22,9 @@ namespace MQTT_Proxy.REST
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[msgId]")]
         public IHttpContext GetMessage(IHttpContext context)
         {
-            Console.WriteLine(context.Request.PathParameters["msgId"]);
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
             if (isNumber)
-                context.Response.SendJSON(Broker.db.messageList.Where(elem => elem.MsgId == msgId));
+                context.Response.SendJSON(Broker.db.messageList.Where(elem => elem.MsgId == msgId).FirstOrDefault());
             else
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
             return context;
