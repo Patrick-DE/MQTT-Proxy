@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h1>YourMomGay</h1>
+    <!--Filter-->
     <b-row>
       <b-col cols="3">
         <b-form-input v-model="ftopic" placeholder="Topic"></b-form-input>
@@ -15,19 +16,45 @@
         <b-form-input v-model="fpayloadString" placeholder="PayloadString"></b-form-input>
       </b-col>
     </b-row>
-
     <b-row>
       <b-col cols="12">
         <b-form-input v-model="fpayload" placeholder="Payload"></b-form-input>
       </b-col>
     </b-row>
+
+    <!--Table for messages-->
     <b-table striped hover :items="this.msg" :fields="this.fields" v-bind:filter-function="this.filterData" v-bind:filter="'yourmomgay'">
+      
+      <!--Button for editing area-->
+      <template slot="show_details" slot-scope="row">
+        <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+          {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
+        </b-button>
+      </template>
+      
+      <!--Textarea in editing area-->
+      <template slot="row-details" slot-scope="row">
+        <b-card>
+          <b-form-textarea
+            id="textarea"
+            v-model="row.item.PayloadString"
+            @blur="focusOut(row)"
+            placeholder="Payload"
+            rows="3"
+            max-rows="6"
+          ></b-form-textarea>
+          <b-button size="sm" @click="sendMessage(row.item)" variant="primary">Send</b-button>
+          <b-button size="sm" @click="saveMessage(row.item)" variant="info">Save</b-button>
+          <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
+        </b-card>
+      </template>
+
     </b-table>
   </div>
 </template>
 
 <script>
-const STATES = ["Sent", "Intercepted", "Modified", "Dropped"];
+const STATES = ["New", "Sent", "Intercepted", "Modified", "Dropped"];
 
 export default {
   name: "Interceptor",
@@ -46,10 +73,12 @@ export default {
         { key: "State", sortable: true, formatter: this.stateToString },
         { key: "ClientId", sortable: true },
         { key: "PayloadString", sortable: true },
-        { key: "Payload", sortable: true, formatter: this.base64toHEX}
+        { key: "Payload", sortable: true, formatter: this.base64toHEX},
+        { key: 'show_details' }
       ],
       msg: null,
 
+      //formatter vars
       ftopic: "",
       fmsgId: -1,
       fclientId: "",
@@ -98,7 +127,36 @@ export default {
       if(this.fpayload != "" && tmp.indexOf(this.fpayload) === -1)
         return false;
       return true;
-    }
+    },
+    /**
+     * Modify payload depending on PayloadString changes
+     * */
+    focusOut: function(row) {
+      row.item.Payload = btoa(row.item.PayloadString);
+    },
+    sendMessage: function(item){
+      console.log(item);
+      item.State = STATES.New;
+      delete item.Timestamp; delete item.MsgId; delete item._showDetails; delete item.PayloadString;
+      this.axios
+        .post(`http://141.19.142.229/api/manager/${item.ClientManagerId}/clientOut/send`, JSON.stringify(item))
+        .then(res => {
+          this.msg = res.data;
+        })
+        .catch(res => {
+          console.err(res);
+        });
+    },/*
+    saveMessage: function(item){
+      this.axios
+        .put(`http://141.19.142.229/api/manager/${item.ClientManagerId}/clientOut/send`, JSON.stringify(item))
+        .then(res => {
+          this.msg = res.data;
+        })
+        .catch(res => {
+          console.err(res);
+        });
+    }*/
   }
 };
 </script>

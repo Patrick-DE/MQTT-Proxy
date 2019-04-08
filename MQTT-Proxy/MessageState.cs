@@ -8,6 +8,7 @@ namespace MQTT_Proxy
 {
     public enum MessageState
     {
+        New,
         Sent,
         Intercepted,
         Modified,

@@ -14,12 +14,12 @@ namespace MQTT_Proxy
         static void Main(string[] args)
         {
             //"String ownIP, int ownPort, String targetIP, int targetPort"
-            args = new string[] { "192.168.1.21", "1883", "192.169.178.120", "1883" };
-            args[0] = Dns.GetHostEntry(Dns.GetHostName())
+            args = new string[] { "141.19.142.229"/*"192.168.1.21"*/, "1883", "192.169.178.120", "1883" };
+            /*args[0] = Dns.GetHostEntry(Dns.GetHostName())
                 .AddressList
                 .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 .ToString();
-
+            */
             Console.WriteLine("Broker: " + args[0] + ":" + args[1]);
             Console.WriteLine("WebUI: " + args[0] + ":80");
             if (args.Length < 4)
@@ -44,13 +44,15 @@ namespace MQTT_Proxy
                 if (i == 0)
                 {
                     string clientId = "clientId";
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
-                    Broker.clientManagers.Add("clientManger", new ClientManager(clientId, proxyConfig));
+                    string clientManagerId = "clientManger";
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, clientManagerId, MessageState.Intercepted));
+                    Broker.clientManagers.Add(clientManagerId, new ClientManager(clientId, proxyConfig));
                 }
                 else { 
                     string clientId = "clientId" + rnd.Next(0, 1000);
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
-                    Broker.clientManagers.Add("clientManger-"+ rnd.Next(0,1000), new ClientManager(clientId, proxyConfig));
+                    string clientManagerId = "clientManger" + rnd.Next(0, 1000);
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, clientManagerId, MessageState.Intercepted));
+                    Broker.clientManagers.Add(clientManagerId, new ClientManager(clientId, proxyConfig));
                 }
             }
             //END DUMMY SHIT!!

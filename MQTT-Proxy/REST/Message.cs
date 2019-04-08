@@ -15,7 +15,9 @@ namespace MQTT_Proxy.REST
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/all")]
         public IHttpContext GetAllMessages(IHttpContext context)
         {
+#if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+#endif
             context.Response.SendJSON(Broker.db.messageList);
             return context;
         }
@@ -23,6 +25,9 @@ namespace MQTT_Proxy.REST
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[msgId]")]
         public IHttpContext GetMessage(IHttpContext context)
         {
+#if DEBUG
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+#endif
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
             if (isNumber)
                 context.Response.SendJSON(Broker.db.messageList.Where(elem => elem.MsgId == msgId).FirstOrDefault());
