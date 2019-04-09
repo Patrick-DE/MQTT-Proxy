@@ -1,8 +1,8 @@
 {
-  "name": "vuejs-bootstrap4-boilerplate",
+  "name": "mqtt-proxy",
   "version": "1.0.0",
-  "description": "A Vue.js project",
-  "author": "Paul Karastelev <paul.karastelev@gmail.com>",
+  "description": "An mqtt-proxy for analyzing and tempering communication",
+  "author": "Patrick Eisenschmidt <patrick.eisenschmidt@gmx.de>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",

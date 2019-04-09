@@ -14,12 +14,12 @@ namespace MQTT_Proxy
         static void Main(string[] args)
         {
             //"String ownIP, int ownPort, String targetIP, int targetPort"
-            args = new string[] { "141.19.142.229"/*"192.168.1.21"*/, "1883", "192.169.178.120", "1883" };
+            args = new string[] { "127.0.0.1"/*"192.168.1.21"*/, "1883", "192.169.178.120", "1883" };
             /*args[0] = Dns.GetHostEntry(Dns.GetHostName())
                 .AddressList
                 .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                .ToString();
-            */
+                .ToString();*/
+            
             Console.WriteLine("Broker: " + args[0] + ":" + args[1]);
             Console.WriteLine("WebUI: " + args[0] + ":80");
             if (args.Length < 4)
