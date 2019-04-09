@@ -1,63 +1,76 @@
 <template>
-  <div class="container">
-    <h1>YourMomGay</h1>
-    <!--Filter-->
-    <b-row>
-      <b-col cols="3">
-        <b-form-input v-model="ftopic" placeholder="Topic"></b-form-input>
-      </b-col>
-      <b-col cols="3">
-        <b-form-input :type="'number'" v-model="fmsgId" placeholder="MsgId"></b-form-input>
-      </b-col>
-      <b-col cols="3">
-        <b-form-input v-model="fclientId" placeholder="ClientId"></b-form-input>
-      </b-col>
-      <b-col cols="3">
-        <b-form-input v-model="fpayloadString" placeholder="PayloadString"></b-form-input>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-        <b-form-input v-model="fpayload" placeholder="Payload"></b-form-input>
-      </b-col>
-    </b-row>
+  <div>
+    <div class="container">
+      <h1>Interceptor</h1>
+      <!--Filter-->
+      <b-row>
+        <b-col cols="3">
+          <b-form-input v-model="ftopic" placeholder="Topic"></b-form-input>
+        </b-col>
+        <b-col cols="3">
+          <b-form-input :type="'number'" v-model="fmsgId" placeholder="MsgId"></b-form-input>
+        </b-col>
+        <b-col cols="3">
+          <b-form-input v-model="fclientId" placeholder="ClientId"></b-form-input>
+        </b-col>
+        <b-col cols="3">
+          <b-form-input v-model="fpayloadString" placeholder="PayloadString"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12">
+          <b-form-input v-model="fpayload" placeholder="Payload"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12">
+          <b-button size="sm" variant="success">New Message</b-button>
+        </b-col>
+      </b-row>
 
-    <!--Table for messages-->
-    <b-table striped hover :items="this.msg" :fields="this.fields" v-bind:filter-function="this.filterData" v-bind:filter="'yourmomgay'">
-      
-      <!--Button for editing area-->
-      <template slot="show_details" slot-scope="row">
-        <b-button size="sm" @click="row.toggleDetails" class="mr-2">
-          {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
-        </b-button>
-      </template>
-      
-      <!--Textarea in editing area-->
-      <template slot="row-details" slot-scope="row">
-        <b-card>
-          <b-form-textarea
-            id="textarea"
-            v-model="row.item.PayloadString"
-            @blur="focusOut(row)"
-            placeholder="Payload"
-            rows="3"
-            max-rows="6"
-          ></b-form-textarea>
-          <b-button size="sm" @click="sendMessage(row.item)" variant="primary">Send</b-button>
-          <b-button size="sm" @click="saveMessage(row.item)" variant="info">Save</b-button>
-          <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
-        </b-card>
-      </template>
+      <!--Table for messages-->
+      <b-table striped hover :items="this.msg" :fields="this.fields" v-bind:filter-function="this.filterData" v-bind:filter="'yourmomgay'">
+        
+        <!--Button for editing area-->
+        <template slot="show_details" slot-scope="row">
+          <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+            {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
+          </b-button>
+        </template>
+        
+        <!--Textarea in editing area-->
+        <template slot="row-details" slot-scope="row">
+          <b-card>
+            <b-form-textarea
+              id="textarea"
+              v-model="row.item.PayloadString"
+              @keyup="onKeyUp(row.item)"
+              placeholder="Payload"
+              rows="3"
+              max-rows="6"
+            ></b-form-textarea>
+            <b-button size="sm" @click="sendMessage(row.item, 'clientOut')" variant="primary">Send request</b-button>
+            <b-button size="sm" @click="sendMessage(row.item, 'clientIn')" variant="primary">Send response</b-button>
+            <b-button size="sm" @click="saveMessage(row.item)" variant="info">Save</b-button>
+            <b-button size="sm" @click="copyMessage(row.item)" variant="warning">Copy</b-button>
+            <!--<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>-->
+          </b-card>
+        </template>
 
-    </b-table>
+      </b-table>
+    </div>
+  <Alert ref="yourMomGayAlert" v-bind:duration=3></Alert>
   </div>
 </template>
 
 <script>
-const STATES = ["New", "Sent", "Intercepted", "Modified", "Dropped"];
+import Alert from "@/components/Alert"
+
+const STATES = {"New":"New", "Sent":"Sent", "Intercepted":"Intercepted", "Modified":"Modified", "Dropped":"Dropped"};
 
 export default {
   name: "Interceptor",
+  components: {Alert},
   //props:['user'], No data transfert to this component
   data() {
     return {
@@ -131,32 +144,63 @@ export default {
     /**
      * Modify payload depending on PayloadString changes
      * */
-    focusOut: function(row) {
-      row.item.Payload = btoa(row.item.PayloadString);
+    onKeyUp: function(item) {
+      item.Payload = btoa(item.PayloadString);
     },
-    sendMessage: function(item){
-      console.log(item);
-      item.State = STATES.New;
-      delete item.Timestamp; delete item.MsgId; delete item._showDetails; delete item.PayloadString;
+    sendMessage: function(item, direction){
+      //first save message
+      this.saveMessage(item, function(err, res){
+        if(err) return console.error(err);
+        if(direction != "clientIn" && direction != "clientOut") return console.error("Please enter a valid direction");
+
+        //res.State = STATES.New;
+        this.axios
+          .post(`http://141.19.142.229/api/manager/${res.ClientId}/${direction}/send`, JSON.stringify(res))
+          .then(response => {
+            this.msg = response.data;
+            this.$refs.yourMomGayAlert.showSuccess("Successfully sent");
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      }.bind(this));
+    },
+    saveMessage: function(item, next){
       this.axios
-        .post(`http://141.19.142.229/api/manager/${item.ClientManagerId}/clientOut/send`, JSON.stringify(item))
+        .post(`http://141.19.142.229/api/message/${item.MsgId}`, JSON.stringify(item))
         .then(res => {
-          this.msg = res.data;
+          var tmp = this.msg.filter(m => m.MsgId == res.MsgId)
+          if (tmp){
+            this.msg[this.msg.indexOf(tmp)] = res;
+          }else{
+            this.msg.push(res);
+          }
+          if(next)
+            next(null,res.data);
+          this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
         })
         .catch(res => {
-          console.err(res);
+          console.error(res);
+          next(res);
         });
-    },/*
-    saveMessage: function(item){
+    },
+    copyMessage: function(item){
       this.axios
-        .put(`http://141.19.142.229/api/manager/${item.ClientManagerId}/clientOut/send`, JSON.stringify(item))
+        .post(`http://141.19.142.229/api/message/${item.MsgId}/copy`)
         .then(res => {
-          this.msg = res.data;
+          this.msg.push(res.data);
+          this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
         })
         .catch(res => {
-          console.err(res);
+          console.error(res);
         });
-    }*/
+    }   
   }
 };
 </script>
+
+<style>
+.form-control{
+  margin-bottom: 10px;
+}
+</style>

@@ -22,13 +22,6 @@
             <router-link to="/interceptor" tag="li" class="nav-item">
               <a class="nav-link">Interceptor</a>
             </router-link>
-            <!--</router-link>
-                        <div class="nav-item">
-                            <a class="nav-link" v-on:click="handleLoginLogout">
-                                {{user ? `Logout (${this.user.name})` : `Login`}}
-                            </a>
-                            <LoginModal ref="loginModal" @loggedIn="loggedIn"></LoginModal>
-            </div>-->
           </ul>
         </div>
       </div>

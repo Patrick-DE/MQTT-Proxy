@@ -24,23 +24,23 @@ namespace MQTT_Proxy.REST
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[managerId]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[clientId]")]
         public IHttpContext GetClientManagerInfo(IHttpContext context)
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
 #endif
-            Console.WriteLine(context.Request.PathParameters["managerId"]);
-            string managerId = context.Request.PathParameters["managerId"];
-            if (managerId == "" || Broker.clientManagers.Select(i => i.Key.Equals(managerId)).First() == false)
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");
+            Console.WriteLine(context.Request.PathParameters["clientId"]);
+            string clientId = context.Request.PathParameters["clientId"];
+            if (clientId == "" || Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == false)
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
             else
-                context.Response.SendJSON(Broker.clientManagers[managerId]);
+                context.Response.SendJSON(Broker.clientManagers[clientId]);
 
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[managerId]/intercept/[value]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[clientId]/intercept/[value]")]
         public IHttpContext UpdateClientManager(IHttpContext context)
         {
 #if DEBUG
@@ -53,18 +53,18 @@ namespace MQTT_Proxy.REST
             }
             else
             {
-                string managerId = context.Request.PathParameters["managerId"];
-                if (managerId == "" || Broker.clientManagers.Select(i => i.Key.Equals(managerId)).First() == false) 
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");
+                string clientId = context.Request.PathParameters["clientId"];
+                if (clientId == "" || Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == false) 
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
                 else {
-                    Broker.clientManagers[managerId].intercept = intercept;
-                    context.Response.SendJSON(Broker.clientManagers[managerId]);
+                    Broker.clientManagers[clientId].intercept = intercept;
+                    context.Response.SendJSON(Broker.clientManagers[clientId]);
                 }
             }
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[managerId]/messages")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[clientId]/messages")]
         public IHttpContext GetManagerMessages(IHttpContext context)
         {
 #if DEBUG
@@ -77,60 +77,60 @@ namespace MQTT_Proxy.REST
             }
             else
             {
-                string managerId = context.Request.PathParameters["managerId"];
-                if (Broker.clientManagers.FirstOrDefault(i => i.Key == managerId).Value != null)
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");
+                string clientId = context.Request.PathParameters["clientId"];
+                if (Broker.clientManagers.FirstOrDefault(i => i.Key == clientId).Value != null)
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
                 else
                 {
-                    Broker.clientManagers[managerId].intercept = intercept;
-                    context.Response.SendJSON(new ClientManagerWithMessages(Broker.clientManagers[managerId]).messages);
+                    Broker.clientManagers[clientId].intercept = intercept;
+                    context.Response.SendJSON(new ClientManagerWithMessages(Broker.clientManagers[clientId]).messages);
                 }
             }
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[managerId]/[whichWay]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[clientId]/[whichWay]")]
         public IHttpContext GetClientInfo(IHttpContext context)
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
 #endif
-            string managerId = context.Request.PathParameters["managerId"];
-            if (managerId != "" && Broker.clientManagers.Select(i => i.Key.Equals(managerId)).First() == true) { 
+            string clientId = context.Request.PathParameters["clientId"];
+            if (clientId != "" && Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == true) { 
                 if (context.Request.PathParameters["whichWay"] == "clientIn")
-                    context.Response.SendJSON(Broker.clientManagers[managerId].clientIn);
+                    context.Response.SendJSON(Broker.clientManagers[clientId].clientIn);
                 else if (context.Request.PathParameters["whichWay"] == "clientOut")
-                    context.Response.SendJSON(Broker.clientManagers[managerId].clientOut);
+                    context.Response.SendJSON(Broker.clientManagers[clientId].clientOut);
                 else
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[managerId]/in' or '[managerId]/out'");
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[clientId]/in' or '[clientId]/out'");
             }else
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
             return context;
         }
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[managerId]/[whichWay]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[clientId]/[whichWay]")]
         public IHttpContext UpdateClient(IHttpContext context)
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
 #endif
             if (bool.TryParse(context.Request.Payload, out bool run)) { 
-                string managerId = context.Request.PathParameters["managerId"];
-                if (managerId != "" && Broker.clientManagers.Select(i => i.Key.Equals(managerId)).First() == true)
+                string clientId = context.Request.PathParameters["clientId"];
+                if (clientId != "" && Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == true)
                 {
                     if (context.Request.PathParameters["whichWay"] == "clientIn") {
-                        Broker.clientManagers[managerId].clientIn.run = run;
-                        context.Response.SendJSON(Broker.clientManagers[managerId].clientIn);
+                        Broker.clientManagers[clientId].clientIn.run = run;
+                        context.Response.SendJSON(Broker.clientManagers[clientId].clientIn);
                     }
                     else if (context.Request.PathParameters["whichWay"] == "clientOut") {
-                        Broker.clientManagers[managerId].clientOut.run = run;
-                        context.Response.SendJSON(Broker.clientManagers[managerId].clientOut);
+                        Broker.clientManagers[clientId].clientOut.run = run;
+                        context.Response.SendJSON(Broker.clientManagers[clientId].clientOut);
                     }
                     else
-                        context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[managerId]/in' or '[managerId]/out'");
+                        context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[clientId]/in' or '[clientId]/out'");
                 }
                 else
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");
             }
             else
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter true/false for 'run'");
@@ -138,25 +138,25 @@ namespace MQTT_Proxy.REST
         }
 
         /*
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[managerId]/[whichWay]/replay/[msgId]")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[clientId]/[whichWay]/replay/[msgId]")]
         public IHttpContext GetMessagesOfClientManagers(IHttpContext context)
         {
             Console.WriteLine(context.Request.PathParameters["msgId"]);
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
             if (isNumber) { 
-                Console.WriteLine(context.Request.PathParameters["managerId"]);
-                string managerId = context.Request.PathParameters["managerId"];
-                if (managerId == "" || Broker.clientManagers.Select(i => i.Key.Equals(managerId)).First() == false)
-                    context.Response.SendJSON(Broker.db.messageList.Where(i => i.MsgId == msgId && i.managerId == managerId).FirstOrDefault());
+                Console.WriteLine(context.Request.PathParameters["clientId"]);
+                string clientId = context.Request.PathParameters["clientId"];
+                if (clientId == "" || Broker.clientManagers.Select(i => i.Key.Equals(clientId)).First() == false)
+                    context.Response.SendJSON(Broker.db.messageList.Where(i => i.MsgId == msgId && i.clientId == clientId).FirstOrDefault());
                 else
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid managerId");  
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid clientId");  
             }else
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid msgId");
 
             return context;
         }*/
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[managerId]/[whichWay]/send")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[clientId]/[whichWay]/send")]
         public IHttpContext SendMessage(IHttpContext context)
         {
 #if DEBUG
@@ -172,8 +172,7 @@ namespace MQTT_Proxy.REST
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, e);
                 return context;
             }
-
-            var manager = Broker.clientManagers.FirstOrDefault(i => i.Key.Equals(msg1.ClientManagerId)).Value;
+            var manager = Broker.clientManagers.FirstOrDefault(i => i.Key.Equals(context.Request.PathParameters["clientId"])).Value;
 
             if (manager != null) {
                 Console.WriteLine(context.Request.PathParameters["whichWay"]);
@@ -187,7 +186,7 @@ namespace MQTT_Proxy.REST
                     client = manager.clientOut;
                 }
                 else { 
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[managerId]/clientIn' or '[managerId]/clientOut'");
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[clientId]/clientIn' or '[clientId]/clientOut'");
                     return context;
                 }
 
@@ -196,7 +195,7 @@ namespace MQTT_Proxy.REST
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.Ok);
             }
             else
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter valid managerId.");            
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter valid clientId.");            
                 
             return context;
         }

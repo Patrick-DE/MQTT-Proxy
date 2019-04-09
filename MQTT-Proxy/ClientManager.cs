@@ -16,10 +16,10 @@ namespace MQTT_Proxy
         public Client clientOut;
         //Target answer to broker
         public Client clientIn;
-        public String clientId;
+        public string clientId;
         public bool intercept = false;
 
-        public ClientManager(String clientId, ProxyConfig proxyConfig)
+        public ClientManager(string clientId, ProxyConfig proxyConfig)
         {
             this.clientId = clientId;
             clientOut = new ClientOut(proxyConfig.targetIP, proxyConfig.targetPort, clientId);

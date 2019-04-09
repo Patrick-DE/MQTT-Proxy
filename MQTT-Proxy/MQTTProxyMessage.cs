@@ -19,7 +19,6 @@ namespace MQTT_Proxy
         public DateTime Timestamp { get; private set; }
         public MessageState State { get; set; }
         public string ClientId { get; set; }
-        public string ClientManagerId { get; set; }
         public string PayloadString
         {
             get { return Encoding.UTF8.GetString(Payload); }
@@ -37,15 +36,11 @@ namespace MQTT_Proxy
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="clientId"></param>
-        /// <param name="clientManagerId"></param>
         /// <param name="state"></param>
-        public MQTTProxyMessage(MqttApplicationMessage msg, string clientId, string clientManagerId, MessageState state)
+        public MQTTProxyMessage(MqttApplicationMessage msg, string clientId, MessageState state) : this()
         {
-            MsgId = GlobalId++;
-            Timestamp = DateTime.Now;
             Payload = msg.Payload;
             ClientId = clientId;
-            ClientManagerId = clientManagerId;
             QoS = (int)msg.QualityOfServiceLevel;
             RetainMsg = msg.Retain;
             Topic = msg.Topic;
@@ -53,25 +48,28 @@ namespace MQTT_Proxy
         }
 
         /// <summary>
-        /// For parsing the incoming webrequests since they have no MqttApplicationMessage reference
+        /// For JSON deserialise
         /// </summary>
-        /// <param name="QoS"></param>
-        /// <param name="Payload"></param>
-        /// <param name="RetainMsg"></param>
-        /// <param name="ClientId"></param>
-        /// <param name="ClientManagerId"></param>
-        /// <param name="State"></param>
-        public MQTTProxyMessage(string ClientId, string ClientManagerId, int QoS, bool RetainMsg, string Topic, byte[] Payload, MessageState State)
+        public MQTTProxyMessage()
         {
-            MsgId = GlobalId++;
             Timestamp = DateTime.Now;
-            this.ClientId = ClientId;
-            this.ClientManagerId = ClientManagerId;
-            this.Payload = Payload;
-            this.QoS = QoS;
-            this.RetainMsg = RetainMsg;
-            this.Topic = Topic;
-            this.State = State;
+            MsgId = GlobalId++;
+            this.State = MessageState.New;
+        }
+
+        /// <summary>
+        /// For CopyMessage
+        /// </summary>
+        /// <param name="other"></param>
+        public MQTTProxyMessage(MQTTProxyMessage other):this()
+        {
+            this.ClientId = other.ClientId;
+            //for deep copy
+            this.Payload = new byte[other.Payload.Length];
+            Array.Copy(other.Payload, this.Payload, this.Payload.Length);
+            this.QoS = other.QoS;
+            this.RetainMsg = other.RetainMsg;
+            this.Topic = other.Topic;
         }
 
         public MqttApplicationMessage ToMqttApplicationMessage()

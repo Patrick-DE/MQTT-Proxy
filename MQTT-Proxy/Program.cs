@@ -44,15 +44,13 @@ namespace MQTT_Proxy
                 if (i == 0)
                 {
                     string clientId = "clientId";
-                    string clientManagerId = "clientManger";
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, clientManagerId, MessageState.Intercepted));
-                    Broker.clientManagers.Add(clientManagerId, new ClientManager(clientId, proxyConfig));
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
+                    Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
                 else { 
                     string clientId = "clientId" + rnd.Next(0, 1000);
-                    string clientManagerId = "clientManger" + rnd.Next(0, 1000);
-                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, clientManagerId, MessageState.Intercepted));
-                    Broker.clientManagers.Add(clientManagerId, new ClientManager(clientId, proxyConfig));
+                    Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
+                    Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
             }
             //END DUMMY SHIT!!

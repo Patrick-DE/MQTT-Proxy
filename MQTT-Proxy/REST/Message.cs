@@ -1,6 +1,7 @@
 ﻿using Grapevine.Interfaces.Server;
 using Grapevine.Server;
 using Grapevine.Server.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,28 +37,57 @@ namespace MQTT_Proxy.REST
             return context;
         }
 
-        /*
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.PUT, PathInfo = "/[msgId]")]
+
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[msgId]")]
         public IHttpContext UpdateMessage(IHttpContext context)
         {
-            Console.WriteLine(context.Request.PathParameters["msgId"]);
+#if DEBUG
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+#endif
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
-            if (isNumber) { 
-                MQTTMessage msg = Broker.db.messageList.Select(elem => elem.MsgId == msgId).FirstOrDefault();
-                if (msg != null) {
-                        msg.PayloadString = context.Request.QueryString["PayloadString"];
-                        msg.QoS = int.Parse(context.Request.QueryString["QoS"]);
-                        msg.RetainMsg = bool.Parse(context.Request.QueryString["RetainMsg"]);
-                        msg.Topic = context.Request.QueryString["Topic"];
+            if (isNumber)
+            {
+                MQTTProxyMessage msg = Broker.db.messageList.FirstOrDefault(elem => elem.MsgId == msgId);
+                if (msg != null)
+                {
+                    try
+                    {
+                        MQTTProxyMessage newMsg = JsonConvert.DeserializeObject<MQTTProxyMessage>(context.Request.Payload);
+                        msg.Payload = newMsg.Payload;
+                        context.Response.SendJSON(msg);
+                    }
+                    catch (Exception e)
+                    {
+                        context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, e);
+                    }
                 }
                 else
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "There is no message associated with this msgId");
+            }
+            else
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
+            return context;
+        }
+
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[msgId]/copy")]
+        public IHttpContext CopyMessage(IHttpContext context)
+        {
+#if DEBUG
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+#endif
+            if (int.TryParse(context.Request.PathParameters["msgId"], out int msgId))
+            {
+                MQTTProxyMessage msg = Broker.db.messageList.FirstOrDefault(elem => elem.MsgId == msgId);
+                if (msg != null)
                 {
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
+                    MQTTProxyMessage newMsg = new MQTTProxyMessage(msg);
+                    Broker.db.messageList.Add(newMsg);
+                    context.Response.SendJSON(newMsg);
                 }
             }
             else
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
             return context;
-        }*/        
+        }
     }
 }
