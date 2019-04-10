@@ -1,27 +1,36 @@
 <template>
-    <div>
+    <div class="container">
         <div role="tablist">
-            <b-card no-body class="mb-1" v-for="client in clients" v-bind:key="client.clientId">
+            <b-card no-body class="mb-1" v-for="value,key in clients" :key="value.clientId">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block href="#" v-b-toggle.accordion-1 variant="info">{{client.clientId}}</b-button>
+                <b-button block href="#" v-b-toggle="value.clientId" variant="info">{{value.clientId}}</b-button>
             </b-card-header>
-            <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">
+            <b-collapse v-bind:id="value.clientId" accordion="my-accordion" role="tabpanel">
                 <b-card-body>
                     <b-card-text>
                         <b-form-checkbox v-model="checked" name="check-button" switch>
-                            Intercept:  <b>(Checked: {{ client.intercept }})</b>
+                            Intercept:  <b>(Checked: {{ value.intercept }})</b>
                         </b-form-checkbox>
                     </b-card-text>
                     <b-row>
                         <b-col cols="6">
                             <h2>Client Out</h2>
-                            <b-card-text>{{ text }}</b-card-text>
+                            <b-card-text>
+                                <pre>
+                                    {{value.clientIn}}
+                                </pre>
+                            </b-card-text>
                         </b-col>
                         <b-col cols="6">
                             <h2>Client In</h2>
-                            <b-card-text>{{ text }}</b-card-text>
+                            <b-card-text>
+                                <pre>
+                                    {{value.clientIn}}
+                                </pre>
+                            </b-card-text>
                         </b-col>
                     </b-row>
+                    <b-button size="sm" variant="danger">Force disconnect</b-button>
                 </b-card-body>
             </b-collapse>
             </b-card>
@@ -60,10 +69,11 @@ export default {
             this.axios
                 .get('http://127.0.0.1/api/manager/all')
                 .then(response => {
-                    var keys = Object.keys(response.data)
+                    /*var keys = Object.keys(response.data)
                     for(var i=0; i<keys.length; i++){
                         this.clients[i] = response.data[keys[i]];
-                    }
+                    }*/
+                    this.clients = response.data;
                     console.log(this.clients);
                 })
                 .catch(response => {
@@ -76,4 +86,8 @@ export default {
 </script>
 
 <style>
+.btn-danger{
+    margin: 0 auto;
+    display: block;
+}
 </style>
