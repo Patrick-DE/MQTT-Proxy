@@ -18,6 +18,7 @@ namespace MQTT_Proxy.REST
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
 #endif
             context.Response.SendJSON(Broker.db.messageList);
             return context;
@@ -28,6 +29,7 @@ namespace MQTT_Proxy.REST
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
 #endif
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
             if (isNumber)
@@ -43,6 +45,7 @@ namespace MQTT_Proxy.REST
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
 #endif
             var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
             if (isNumber)
@@ -74,6 +77,7 @@ namespace MQTT_Proxy.REST
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
 #endif
             if (int.TryParse(context.Request.PathParameters["msgId"], out int msgId))
             {

@@ -7,30 +7,62 @@
             </b-card-header>
             <b-collapse v-bind:id="value.clientId" accordion="my-accordion" role="tabpanel">
                 <b-card-body>
-                    <b-card-text>
-                        <b-form-checkbox v-model="checked" name="check-button" switch>
-                            Intercept:  <b>(Checked: {{ value.intercept }})</b>
+                    <b-card-text class="check">
+                        <b-form-checkbox v-model="value.intercept" name="check-button" @input="toggleIntercept(key)" switch>
+                            <b>Intercept</b>  (Checked: {{ value.intercept }})
                         </b-form-checkbox>
                     </b-card-text>
                     <b-row>
                         <b-col cols="6">
                             <h2>Client Out</h2>
                             <b-card-text>
-                                <pre>
-                                    {{value.clientIn}}
-                                </pre>
+                                <p v-for="value,key in value.clientOut" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>Options</b><br/>
+                                <p v-for="value,key in value.clientOut.options" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>Credentials</b><br/>
+                                <p v-for="value,key in value.clientOut.options.Credentials" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>ChannelOptions</b><br/>
+                                <p v-for="value,key in value.clientOut.options.ChannelOptions" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>TlsOptions</b><br/>
+                                <p v-for="value,key in value.clientOut.options.ChannelOptions.TlsOptions" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
                             </b-card-text>
                         </b-col>
                         <b-col cols="6">
                             <h2>Client In</h2>
                             <b-card-text>
-                                <pre>
-                                    {{value.clientIn}}
-                                </pre>
+                                <p v-for="value,key in value.clientOut" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>Options</b><br/>
+                                <p v-for="value,key in value.clientOut.options" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>Credentials</b><br/>
+                                <p v-for="value,key in value.clientOut.options.Credentials" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>ChannelOptions</b><br/>
+                                <p v-for="value,key in value.clientOut.options.ChannelOptions" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
+                                <b>TlsOptions</b><br/>
+                                <p v-for="value,key in value.clientOut.options.ChannelOptions.TlsOptions" v-if="notObject(value)">
+                                    {{key}}: {{ (value != null) ? value: emptySymbol }}
+                                </p>
                             </b-card-text>
                         </b-col>
                     </b-row>
-                    <b-button size="sm" variant="danger">Force disconnect</b-button>
+                    <b-button size="sm" @click="disconnect(key)" variant="danger">Force disconnect</b-button>
                 </b-card-body>
             </b-collapse>
             </b-card>
@@ -41,6 +73,7 @@
 
 <script>
 import Alert from "@/components/Alert"
+import { isObject } from 'util';
 
 export default {
     name: "Clients",
@@ -58,7 +91,7 @@ export default {
                 vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic
                 synth nesciunt you probably haven't heard of them accusamus labore VHS.
                 `,
-            checked: false,
+            emptySymbol: '-',
         }
     },
     created: function(){
@@ -69,15 +102,40 @@ export default {
             this.axios
                 .get('http://127.0.0.1/api/manager/all')
                 .then(response => {
-                    /*var keys = Object.keys(response.data)
-                    for(var i=0; i<keys.length; i++){
-                        this.clients[i] = response.data[keys[i]];
-                    }*/
-                    this.clients = response.data;
+                     this.clients = response.data;
+                })
+                .catch(response => {
+                    this.$refs.yourMomGayAlert.showError("Error: while fetching all clients!");
+                    console.error(response);
+                });
+        },
+        notObject: function(elem) {
+            return  !isObject(elem);
+        },
+        disconnect: function(clientId){
+            this.axios
+                .delete(`http://127.0.0.1/api/manager/${clientId}`)
+                .then(response => {
+                    this.$refs.yourMomGayAlert.showSuccess(response.data);
+                    console.log(this.clients);
+                    console.log(this.clients[clientId]);
+                    delete this.clients[clientId];
+                    console.log(this.clients[clientId]);
                     console.log(this.clients);
                 })
                 .catch(response => {
-                    this.$refs.yourMomGayAlert.showError("Error: fetching all clients!");
+                    this.$refs.yourMomGayAlert.showError("Error: while disconnecting client!");
+                    console.error(response);
+                });
+        },
+        toggleIntercept: function(clientId){
+            this.axios
+                .put(`http://127.0.0.1/api/manager/${clientId}/intercept/${this.clients[clientId].intercept}`)
+                .then(response => {
+                    this.$refs.yourMomGayAlert.showSuccess(response.data);
+                })
+                .catch(response => {
+                    this.$refs.yourMomGayAlert.showError("Error: while toggle intercept!");
                     console.error(response);
                 });
         }
@@ -89,5 +147,8 @@ export default {
 .btn-danger{
     margin: 0 auto;
     display: block;
+}
+.check{
+    text-align: center;
 }
 </style>

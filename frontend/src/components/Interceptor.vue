@@ -29,7 +29,7 @@
       </b-row>
 
       <!--Table for messages-->
-      <b-table striped hover :items="this.msg" :fields="this.fields" v-bind:filter-function="this.filterData" v-bind:filter="'yourmomgay'">
+      <b-table striped hover :items="this.msg" :fields="this.fields" v-bind:filter-function="this.filterData" v-bind:filter="'dummy'">
         
         <!--Button for editing area-->
         <template slot="show_details" slot-scope="row">
