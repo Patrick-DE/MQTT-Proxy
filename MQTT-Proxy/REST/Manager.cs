@@ -84,7 +84,7 @@ namespace MQTT_Proxy.REST
                         status = "activated";
                     else
                         status = "deactivated";
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Intercept successfully "+ status);
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.Ok, "Intercept successfully "+ status);
                 }
             }
             return context;
