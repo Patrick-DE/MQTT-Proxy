@@ -105,12 +105,12 @@ export default {
   methods: {
     getAllMessages: function(event) {
       this.axios
-        .get("http://141.19.142.229/api/message/all")
+        .get("http://127.0.0.1/api/message/all")
         .then(res => {
           this.msg = res.data;
         })
         .catch(res => {
-          console.err(res);
+          console.error(res);
         });
     },
     stateToString: function(state) {
@@ -155,7 +155,7 @@ export default {
 
         //res.State = STATES.New;
         this.axios
-          .post(`http://141.19.142.229/api/manager/${res.ClientId}/${direction}/send`, JSON.stringify(res))
+          .post(`http://127.0.0.1/api/manager/${res.ClientId}/${direction}/send`, JSON.stringify(res))
           .then(response => {
             this.msg = response.data;
             this.$refs.yourMomGayAlert.showSuccess("Successfully sent");
@@ -167,7 +167,7 @@ export default {
     },
     saveMessage: function(item, next){
       this.axios
-        .post(`http://141.19.142.229/api/message/${item.MsgId}`, JSON.stringify(item))
+        .post(`http://127.0.0.1/api/message/${item.MsgId}`, JSON.stringify(item))
         .then(res => {
           var tmp = this.msg.filter(m => m.MsgId == res.MsgId)
           if (tmp){
@@ -186,7 +186,7 @@ export default {
     },
     copyMessage: function(item){
       this.axios
-        .post(`http://141.19.142.229/api/message/${item.MsgId}/copy`)
+        .post(`http://127.0.0.1/api/message/${item.MsgId}/copy`)
         .then(res => {
           this.msg.push(res.data);
           this.$refs.yourMomGayAlert.showSuccess("Successfully saved");

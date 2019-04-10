@@ -22,6 +22,9 @@
             <router-link to="/interceptor" tag="li" class="nav-item">
               <a class="nav-link">Interceptor</a>
             </router-link>
+            <router-link to="/clients" tag="li" class="nav-item">
+              <a class="nav-link">Clients</a>
+            </router-link>
           </ul>
         </div>
       </div>
