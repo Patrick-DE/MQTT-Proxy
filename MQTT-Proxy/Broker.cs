@@ -17,12 +17,14 @@ namespace MQTT_Proxy
         public static Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
         ProxyConfig proxyConfig;
         public static EzDatabase db;
+        public static Websocket ws;
 
         private IMqttServerOptions optionsBuilder;
 
         public Broker(ProxyConfig proxyConfig)
         {
             db = new EzDatabase();
+            ws = new Websocket("127.0.0.1");
             this.proxyConfig = proxyConfig;
             // Start a MQTT server.
             optionsBuilder = new MqttServerOptionsBuilder()
@@ -51,9 +53,10 @@ namespace MQTT_Proxy
             // do not create clientmanager for connecting fakeClient
             if (e.ClientId.EndsWith("_fake")) return;
 
-            if (clientManagers.ContainsKey(e.ClientId))
-            {
-                throw new Exception("ClientId already exists!");
+            if (clientManagers.ContainsKey(e.ClientId)) { 
+                Console.WriteLine("Client" + e.ClientId + " is reconnecting!");
+                //clientManagers.Remove(e.ClientId);
+                //throw new Exception("ClientId already exists!");
             }
             else
             {
@@ -70,6 +73,7 @@ namespace MQTT_Proxy
         public async void HandleMessage (MqttApplicationMessageInterceptorContext context){
             Console.WriteLine("Broker: New message");
 
+            //if(clientManagers[context.ClientId] == null) 
             if (context.ClientId.EndsWith("_fake")) return;
 
             Console.WriteLine("### BROKER: RECEIVED APPLICATION MESSAGE ###");
@@ -84,7 +88,9 @@ namespace MQTT_Proxy
             //If intercept on save msg
             if (clientManagers[context.ClientId].intercept)
             {
-                db.messageList.Add(new MQTTProxyMessage(context.ApplicationMessage, context.ClientId, MessageState.Intercepted));
+                MQTTProxyMessage tmp = new MQTTProxyMessage(context.ApplicationMessage, context.ClientId, MessageState.Intercepted);
+                db.messageList.Add(tmp);
+                ws.SendMessage(tmp);
             }
             //if intercept off forward
             else {

@@ -100,9 +100,14 @@ export default {
     };
   },
   created: function() {
+	this.$options.sockets.onmessage = this.processData;
     this.getAllMessages();
   },
   methods: {
+	processData: function(event) {
+      var data = JSON.parse(event.data);
+      this.msg.push(data);
+    },
     getAllMessages: function(event) {
       this.axios
         .get("http://127.0.0.1/api/message/all")
