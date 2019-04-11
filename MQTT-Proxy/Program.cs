@@ -34,6 +34,7 @@ namespace MQTT_Proxy
             Random rnd = new Random();
 
             //DUMMY SHIT!!
+            /*
             for (int i=0; i< 10; i++)
             {
                 MqttApplicationMessage msg = new MqttApplicationMessage();
@@ -53,6 +54,7 @@ namespace MQTT_Proxy
                     Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
             }
+            */
             //END DUMMY SHIT!!
 
             var rest = new RestServer
