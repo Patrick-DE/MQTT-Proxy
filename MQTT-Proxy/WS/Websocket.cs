@@ -1,25 +1,26 @@
-﻿using WebSocketSharp;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebSocketSharp.Server;
 
 namespace MQTT_Proxy
 {
-    class Websocket
+    class MessageWS : WebSocketBehavior
     {
-        WebSocket ws;
-        public Websocket(string path)
+        WebSocketServer wss;
+        public MessageWS()
         {
-            ws = new WebSocket("ws://"+path);
+            wss = new WebSocketServer("ws://localhost:8081");
+            wss.AddWebSocketService<MessageWS>("/");
         }
-        public bool Connect()
+        public bool Start()
         {
             try
             {
-                ws.Connect();
+                wss.Start();
                 return true;
             }
             catch (Exception e)
@@ -31,7 +32,7 @@ namespace MQTT_Proxy
         public void SendMessage(MQTTProxyMessage msg)
         {
             Console.WriteLine("Sending UI update");
-            ws.Send(JsonConvert.SerializeObject(msg));
+            Send(JsonConvert.SerializeObject(msg));
         }
     }
 }

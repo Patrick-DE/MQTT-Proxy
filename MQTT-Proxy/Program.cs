@@ -31,9 +31,8 @@ namespace MQTT_Proxy
             ProxyConfig proxyConfig = new ProxyConfig(args[0], int.Parse(args[1]), args[2], int.Parse(args[3]));
             var broker = new Broker(proxyConfig);
             broker.Start();
-
             //DUMMY SHIT!!
-            /*
+
             Random rnd = new Random();
             for (int i=0; i< 10; i++)
             {
@@ -53,8 +52,7 @@ namespace MQTT_Proxy
                     Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
                     Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
-            }
-            */
+            }            
             //END DUMMY SHIT!!
 
             var rest = new RestServer
@@ -65,7 +63,6 @@ namespace MQTT_Proxy
                 
             };
             rest.Start();
-            Broker.ws.Connect();
 
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();

@@ -100,8 +100,8 @@ export default {
     };
   },
   created: function() {
-	this.$options.sockets.onmessage = this.processData;
     this.getAllMessages();
+	  this.$options.sockets.onmessage = this.processData;
   },
   methods: {
 	processData: function(event) {

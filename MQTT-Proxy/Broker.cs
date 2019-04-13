@@ -17,14 +17,15 @@ namespace MQTT_Proxy
         public static Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
         ProxyConfig proxyConfig;
         public static EzDatabase db;
-        public static Websocket ws;
+        public static MessageWS wss;
 
         private IMqttServerOptions optionsBuilder;
 
         public Broker(ProxyConfig proxyConfig)
         {
             db = new EzDatabase();
-            ws = new Websocket("127.0.0.1");
+            wss = new MessageWS();
+            wss.Start();
             this.proxyConfig = proxyConfig;
             // Start a MQTT server.
             optionsBuilder = new MqttServerOptionsBuilder()
@@ -90,7 +91,7 @@ namespace MQTT_Proxy
             {
                 MQTTProxyMessage tmp = new MQTTProxyMessage(context.ApplicationMessage, context.ClientId, MessageState.Intercepted);
                 db.messageList.Add(tmp);
-                ws.SendMessage(tmp);
+                wss.SendMessage(tmp);
             }
             //if intercept off forward
             else {

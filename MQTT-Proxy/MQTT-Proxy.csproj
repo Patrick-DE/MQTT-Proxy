@@ -91,7 +91,7 @@
     <Compile Include="REST\Message.cs" />
     <Compile Include="MessageState.cs" />
     <Compile Include="REST\RESTExtention.cs" />
-    <Compile Include="Websocket.cs" />
+    <Compile Include="WS\Websocket.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
