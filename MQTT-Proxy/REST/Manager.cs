@@ -169,49 +169,50 @@ namespace MQTT_Proxy.REST
 
         
 
-        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[clientId]/[whichWay]/send")]
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[clientId]/[whichWay]/[msgId]/send")]
         public IHttpContext SendMessage(IHttpContext context)
         {
 #if DEBUG
             context.Response.Headers["Access-Control-Allow-Origin"] = "*";
             context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
 #endif
-            //validation of sent parameters
-            MQTTProxyMessage msg1;
-            try { 
-                msg1 = JsonConvert.DeserializeObject<MQTTProxyMessage>(context.Request.Payload);
-                if (msg1 == null) throw new Exception();
-            }catch(Exception e)
+            if (int.TryParse(context.Request.PathParameters["msgId"], out int msgId))
             {
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, e);
-                return context;
-            }
-            var manager = Broker.clientManagers.FirstOrDefault(i => i.Key.Equals(context.Request.PathParameters["clientId"])).Value;
-
-            if (manager != null) {
-                Console.WriteLine(context.Request.PathParameters["whichWay"]);
-                MQTT_Proxy.Client client = null;
-                if (context.Request.PathParameters["whichWay"] == "clientIn")
+                MQTTProxyMessage msg = Broker.db.messageList.FirstOrDefault(elem => elem.MsgId == msgId);
+                if (msg != null)
                 {
-                    client = manager.clientIn;
-                }
-                else if (context.Request.PathParameters["whichWay"] == "clientOut")
-                {
-                    client = manager.clientOut;
-                }
-                else { 
-                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[clientId]/clientIn' or '[clientId]/clientOut'");
-                    return context;
-                }
+                    var manager = Broker.clientManagers.FirstOrDefault(i => i.Key.Equals(context.Request.PathParameters["clientId"])).Value;
 
-                //correct 
-                client.SendMessage(msg1.ToMqttApplicationMessage()).Wait();
-                Broker.db.messageList.Add(msg1);
-                context.Response.SendJSON(msg1);
-            }
-            else
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter valid clientId.");            
-                
+                    if (manager != null)
+                    {
+                        Console.WriteLine(context.Request.PathParameters["whichWay"]);
+                        MQTT_Proxy.Client client = null;
+                        if (context.Request.PathParameters["whichWay"] == "clientIn")
+                        {
+                            client = manager.clientIn;
+                        }
+                        else if (context.Request.PathParameters["whichWay"] == "clientOut")
+                        {
+                            client = manager.clientOut;
+                        }
+                        else
+                        {
+                            context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter '[clientId]/clientIn' or '[clientId]/clientOut'");
+                            return context;
+                        }
+
+                        //correct 
+                        client.SendMessage(msg.ToMqttApplicationMessage()).Wait();
+                        msg.State = MessageState.Sent;
+                        context.Response.SendJSON(msg);
+                    }
+                    else
+                        context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter valid clientId.");
+                }else
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "No message associated with this msgId.");
+            }else
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter a valid msgId.");
+
             return context;
         }
 

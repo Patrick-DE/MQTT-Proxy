@@ -32,7 +32,7 @@ namespace MQTT_Proxy
         public void SendMessage(MQTTProxyMessage msg)
         {
             Console.WriteLine("Sending UI update");
-            Send(JsonConvert.SerializeObject(msg));
+            Sessions.Broadcast(JsonConvert.SerializeObject(msg));
         }
     }
 }
