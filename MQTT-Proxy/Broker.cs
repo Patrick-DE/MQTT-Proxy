@@ -117,7 +117,7 @@ namespace MQTT_Proxy
             if (clientManagers[context.ClientId].clientOut.IsConnected())
             {
                 Console.WriteLine("Broker: Sending msg via ClientOut");
-                string tmp = Encoding.UTF8.GetString(context.ApplicationMessage.Payload) + DateTime.Now.Ticks.ToString();
+                string tmp = Encoding.UTF8.GetString(context.ApplicationMessage.Payload)/* + DateTime.Now.Ticks.ToString()*/;
                 await clientManagers[context.ClientId].clientOut.SendMessage(Encoding.UTF8.GetBytes(tmp), context.ApplicationMessage.Topic);
                 Console.WriteLine("Broker: Message sent via ClientOut");
             }
