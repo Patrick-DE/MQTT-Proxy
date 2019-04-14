@@ -105,6 +105,8 @@ export default {
   },
   methods: {
 	processData: function(event) {
+      Console.log("WS: Incomming Message");
+      Console.log(event.data);
       var data = JSON.parse(event.data);
       this.msg.push(data);
     },
