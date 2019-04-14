@@ -51,7 +51,7 @@
             ></b-form-textarea>
             <b-button size="sm" @click="sendMessage(row.item, 'clientOut')" variant="primary">Send request</b-button>
             <b-button size="sm" @click="sendMessage(row.item, 'clientIn')" variant="primary">Send response</b-button>
-            <b-button size="sm" @click="saveMessage(row.item)" variant="info">Save</b-button>
+            <b-button size="sm" @click="updateMessage(row.item)" variant="info">Save</b-button>
             <b-button size="sm" @click="copyMessage(row.item)" variant="warning">Copy</b-button>
             <!--<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>-->
           </b-card>
@@ -108,7 +108,14 @@ export default {
       Console.log("WS: Incomming Message");
       Console.log(event.data);
       var data = JSON.parse(event.data);
-      this.msg.push(data);
+      var tmp = this.msg.filter(m => m.MsgId == data.MsgId);
+      if (tmp){
+        this.msg[this.msg.indexOf(tmp)] = res;
+        Console.log("WS: Updated Message");
+      }else{
+        Console.log("WS: Added Message");
+        this.msg.push(res);
+      }
     },
     getAllMessages: function(event) {
       this.axios
@@ -156,23 +163,34 @@ export default {
     },
     sendMessage: function(item, direction){
       //first save message
-      this.saveMessage(item, function(err, data){
+      this.updateMessage(item, function(err, data){
         if(err) return console.error(err);
         if(direction != "clientIn" && direction != "clientOut") return console.error("Please enter a valid direction");
 
         //res.State = STATES.New;
         this.axios
-          .post(`http://127.0.0.1/api/manager/${res.ClientId}/${direction}/send`, JSON.stringify(data))
+          .post(`http://127.0.0.1/api/manager/${data.ClientId}/${direction}/${data.MsgId}/send`)
           .then(response => {
-            this.msg = response.data;
-            this.$refs.yourMomGayAlert.showSuccess("Successfully sent");
+            this.$refs.yourMomGayAlert.showSuccess("Message " + response.data.MsgId + " successfully sent");
           })
           .catch(err => {
             console.error(err);
           });
       }.bind(this));
     },
-    saveMessage: function(item, next){
+    craftMessage: function(item, next){
+      this.axios
+          .post(`http://127.0.0.1/api/message/new`, JSON.stringify(data))
+          .then(response => {
+            this.msg.push(response.data);
+            this.$refs.yourMomGayAlert.showSuccess("Message " + response.data.MsgId + " successfully created");
+            next(null, res.data);
+          })
+          .catch(err => {
+            console.error(err);
+          });
+    },
+    updateMessage: function(item, next){
       this.axios
         .post(`http://127.0.0.1/api/message/${item.MsgId}`, JSON.stringify(item))
         .then(res => {
