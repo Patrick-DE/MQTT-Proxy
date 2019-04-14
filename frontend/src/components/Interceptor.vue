@@ -160,7 +160,7 @@ export default {
 
         //res.State = STATES.New;
         this.axios
-          .post(`http://127.0.0.1/api/manager/${res.ClientId}/${direction}/send`, JSON.stringify(res))
+          .post(`http://127.0.0.1/api/manager/${res.data.ClientId}/${direction}/send`, JSON.stringify(res.data))
           .then(response => {
             this.msg = response.data;
             this.$refs.yourMomGayAlert.showSuccess("Successfully sent");
