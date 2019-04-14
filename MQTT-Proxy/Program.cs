@@ -32,7 +32,7 @@ namespace MQTT_Proxy
             var broker = new Broker(proxyConfig);
             broker.Start();
             //DUMMY SHIT!!
-
+            /*
             Random rnd = new Random();
             for (int i=0; i< 10; i++)
             {
@@ -52,7 +52,8 @@ namespace MQTT_Proxy
                     Broker.db.messageList.Add(new MQTTProxyMessage(msg, clientId, MessageState.Intercepted));
                     Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
-            }            
+            } 
+            */
             //END DUMMY SHIT!!
 
             var rest = new RestServer

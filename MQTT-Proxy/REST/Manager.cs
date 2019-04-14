@@ -206,7 +206,8 @@ namespace MQTT_Proxy.REST
 
                 //correct 
                 client.SendMessage(msg1.ToMqttApplicationMessage()).Wait();
-                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.Ok);
+                Broker.db.messageList.Add(msg1);
+                context.Response.SendJSON(msg1);
             }
             else
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Please enter valid clientId.");            
