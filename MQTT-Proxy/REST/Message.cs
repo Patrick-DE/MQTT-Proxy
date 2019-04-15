@@ -24,6 +24,32 @@ namespace MQTT_Proxy.REST
             return context;
         }
 
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/new")]
+        public IHttpContext CraftNewMessages(IHttpContext context)
+        {
+#if DEBUG
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
+#endif
+            //validation of sent parameters
+            MQTTProxyMessage msg1;
+            try
+            {
+                msg1 = JsonConvert.DeserializeObject<MQTTProxyMessage>(context.Request.Payload);
+                //Just throw an exception to get into catch
+                if (msg1 == null) throw new Exception();
+            }
+            catch (Exception e)
+            {
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, e);
+                return context;
+            }
+            Broker.db.messageList.Add(msg1);
+            Broker.wss.SendMessage(msg1);
+            context.Response.SendJSON(msg1);
+            return context;
+        }
+
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.GET, PathInfo = "/[msgId]")]
         public IHttpContext GetMessage(IHttpContext context)
         {
@@ -38,7 +64,6 @@ namespace MQTT_Proxy.REST
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
             return context;
         }
-
 
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[msgId]")]
         public IHttpContext UpdateMessage(IHttpContext context)
