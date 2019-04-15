@@ -25,6 +25,7 @@
       <b-row>
         <b-col cols="12">
           <b-button size="sm" variant="success">New Message</b-button>
+          <b-button size="sm" @click="this.msg = []" variant="warning" style="float:right;">Clear</b-button>
         </b-col>
       </b-row>
 
@@ -36,6 +37,7 @@
           <b-button size="sm" @click="row.toggleDetails" class="mr-2">
             {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
           </b-button>
+          <b-button size="sm" @click="deleteMessage(row.item)" variant="danger"><i class="far fa-trash-alt"></i></b-button>
         </template>
         
         <!--Textarea in editing area-->
@@ -87,7 +89,7 @@ export default {
         { key: "ClientId", sortable: true },
         { key: "PayloadString", sortable: true },
         { key: "Payload", sortable: true, formatter: this.base64toHEX},
-        { key: 'show_details' }
+        { key: 'show_details', label: "Action" }
       ],
       msg: null,
       ip: '192.168.1.21',
@@ -107,17 +109,8 @@ export default {
   },
   methods: {
 	  processData: function(event) {
-      Console.log("WS: Incomming Message");
-      Console.log(event.data);
       var data = JSON.parse(event.data);
-      var tmp = this.msg.filter(m => m.MsgId == data.MsgId);
-      if (tmp){
-        this.msg[this.msg.indexOf(tmp)] = res;
-        Console.log("WS: Updated Message");
-      }else{
-        Console.log("WS: Added Message");
-        this.msg.push(res);
-      }
+      this.updateModel(data);
     },
     getAllMessages: function(event) {
       this.axios
@@ -164,9 +157,9 @@ export default {
       item.Payload = btoa(item.PayloadString);
     },
     updateModel: function(item){
-      var tmp = this.msg.filter(m => m.MsgId == item.MsgId)
+      var tmp = this.msg.find(m => m.MsgId == item.MsgId)
       if (tmp){
-        var pos = this.msg.indexOf(tmp[0]);
+        var pos = this.msg.indexOf(tmp);
         this.msg[pos] = item;
       }else{
         this.msg.push(item);
