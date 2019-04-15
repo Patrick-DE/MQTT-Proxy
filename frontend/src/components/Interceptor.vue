@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <h1>Interceptor</h1>
+      <h1>Interceptor</h1>      
       <!--Filter-->
       <b-row>
         <b-col cols="3">
@@ -24,7 +24,7 @@
       </b-row>
       <b-row>
         <b-col cols="12">
-          <b-button size="sm" variant="success"><i class="fas fa-plus-circle"></i></b-button>
+          <b-button size="sm" @click="redirect()" variant="success"><i class="fas fa-plus-circle"></i></b-button>
           <b-button size="sm" @click="clearMsg()" variant="warning" style="float:right;">Clear</b-button>
         </b-col>
       </b-row>
@@ -93,7 +93,7 @@ export default {
         { key: 'show_details', label: "Action" }
       ],
       msg: null,
-      ip: '192.168.1.21',
+      ip: process.env.IP,
 
       //formatter vars
       ftopic: "",
@@ -109,6 +109,9 @@ export default {
     this.$socket.send('some data');
   },
   methods: {
+    redirect: function(){
+      this.$router.push("createmessage")
+    },
     clearMsg: function(){
       this.msg = [];
     },
@@ -201,18 +204,6 @@ export default {
           console.error(res);
           next(res);
         });
-    },
-    craftMessage: function(item, next){
-      this.axios
-          .post(`http://127.0.0.1/api/message/new`, JSON.stringify(data))
-          .then(response => {
-            this.msg.push(response.data);
-            this.$refs.yourMomGayAlert.showSuccess("Message " + response.data.MsgId + " successfully created");
-            next(null, res.data);
-          })
-          .catch(err => {
-            console.error(err);
-          });
     },
     copyMessage: function(item){
       this.axios

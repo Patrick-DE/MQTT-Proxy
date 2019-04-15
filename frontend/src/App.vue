@@ -25,6 +25,9 @@
             <router-link to="/clients" tag="li" class="nav-item">
               <a class="nav-link">Clients</a>
             </router-link>
+            <router-link to="/createmessage" tag="li" class="nav-item">
+              <a class="nav-link">Create Message</a>
+            </router-link>
           </ul>
         </div>
       </div>
