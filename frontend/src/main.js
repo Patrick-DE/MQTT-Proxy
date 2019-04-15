@@ -14,7 +14,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
-Vue.use(VueNativeSock, 'ws://localhost:8081', { format: 'json', reconnection: true, reconnectionDelay: 1000 })
+Vue.use(VueNativeSock, 'ws://192.168.1.21:9090', { format: 'json', reconnection: true, reconnectionDelay: 1000})
 
 
 /* eslint-disable no-new */

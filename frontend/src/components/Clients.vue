@@ -62,7 +62,7 @@
                             </b-card-text>
                         </b-col>
                     </b-row>
-                    <b-button size="sm" @click="disconnect(key)" variant="danger">Force disconnect</b-button>
+                    <b-button size="sm" @click="disconnect(key)" class="client_remove_button" variant="danger">Force disconnect</b-button>
                 </b-card-body>
             </b-collapse>
             </b-card>
@@ -82,6 +82,7 @@ export default {
         return {
             clients: [],
             emptySymbol: '-',
+            ip: '192.168.1.21'
         }
     },
     created: function(){
@@ -90,7 +91,7 @@ export default {
     methods:{
         getClients: function(){
             this.axios
-                .get('http://127.0.0.1/api/manager/all')
+                .get(`http://${this.ip}/api/manager/all`)
                 .then(response => {
                      this.clients = response.data;
                 })
@@ -104,7 +105,7 @@ export default {
         },
         disconnect: function(clientId){
             this.axios
-                .delete(`http://127.0.0.1/api/manager/${clientId}`)
+                .delete(`http://${this.ip}/api/manager/${clientId}`)
                 .then(response => {
                     this.$refs.yourMomGayAlert.showSuccess(response.data);
                     console.log(this.clients);
@@ -120,7 +121,7 @@ export default {
         },
         toggleIntercept: function(clientId){
             this.axios
-                .put(`http://127.0.0.1/api/manager/${clientId}/intercept/${this.clients[clientId].intercept}`)
+                .put(`http://${this.ip}/api/manager/${clientId}/intercept/${this.clients[clientId].intercept}`)
                 .then(response => {
                     this.$refs.yourMomGayAlert.showSuccess(response.data);
                 })
@@ -134,7 +135,7 @@ export default {
 </script>
 
 <style>
-.btn-danger{
+.client_remove_button{
     margin: 0 auto;
     display: block;
 }
