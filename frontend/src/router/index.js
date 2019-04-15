@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Interceptor from '@/components/Interceptor'
 import Clients from '@/components/Clients'
+import NewMessage from "@/components/NewMessage"
 
 Vue.use(Router)
 Vue.use(BootstrapVue)
@@ -26,6 +27,12 @@ export default new Router({
       path: '/clients',
       name: 'Clients',
       component: Clients,
-    }
+    },
+    {
+      path: '/createmessage',
+      name: 'NewMessage',
+      component: NewMessage,
+    },
+    
   ]
 })

@@ -82,7 +82,7 @@ export default {
         return {
             clients: [],
             emptySymbol: '-',
-            ip: '192.168.1.21'
+            ip: process.env.IP,
         }
     },
     created: function(){
