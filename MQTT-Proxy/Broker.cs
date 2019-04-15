@@ -17,14 +17,14 @@ namespace MQTT_Proxy
         public static Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
         ProxyConfig proxyConfig;
         public static EzDatabase db;
-        public static MessageWS wss;
+        public static WSServer wss;
 
         private IMqttServerOptions optionsBuilder;
 
         public Broker(ProxyConfig proxyConfig)
         {
             db = new EzDatabase();
-            wss = new MessageWS();
+            wss = new WSServer(proxyConfig.ownIP);
             wss.Start();
             this.proxyConfig = proxyConfig;
             // Start a MQTT server.
