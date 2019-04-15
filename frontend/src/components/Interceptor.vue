@@ -66,7 +66,7 @@
 <script>
 import Alert from "@/components/Alert"
 
-const STATES = {"New":"New", "Sent":"Sent", "Intercepted":"Intercepted", "Modified":"Modified", "Dropped":"Dropped"};
+const STATES = ["New","Sent","Intercepted","Modified","Dropped"];
 
 export default {
   name: "Interceptor",
@@ -102,10 +102,11 @@ export default {
   },
   created: function() {
     this.getAllMessages();
-	  this.$options.sockets.onmessage = this.processData;
+    this.$options.sockets.onmessage = this.processData;
+    this.$socket.send('some data');
   },
   methods: {
-	processData: function(event) {
+	  processData: function(event) {
       Console.log("WS: Incomming Message");
       Console.log(event.data);
       var data = JSON.parse(event.data);
@@ -120,7 +121,7 @@ export default {
     },
     getAllMessages: function(event) {
       this.axios
-        .get(`http://${ip}/api/message/all`)
+        .get(`http://${this.ip}/api/message/all`)
         .then(res => {
           this.msg = res.data;
         })
@@ -162,22 +163,47 @@ export default {
     onKeyUp: function(item) {
       item.Payload = btoa(item.PayloadString);
     },
+    updateModel: function(item){
+      var tmp = this.msg.filter(m => m.MsgId == item.MsgId)
+      if (tmp){
+        var pos = this.msg.indexOf(tmp[0]);
+        this.msg[pos] = item;
+      }else{
+        this.msg.push(item);
+      }
+    },
     sendMessage: function(item, direction){
       //first save message
       this.updateMessage(item, function(err, data){
         if(err) return console.error(err);
         if(direction != "clientIn" && direction != "clientOut") return console.error("Please enter a valid direction");
 
-        //res.State = STATES.New;
         this.axios
-          .post(`http://${ip}/api/manager/${data.ClientId}/${direction}/${data.MsgId}/send`)
+          .post(`http://${this.ip}/api/manager/${data.ClientId}/${direction}/${data.MsgId}/send`)
           .then(response => {
+            this.updateModel
+      (response.data);
             this.$refs.yourMomGayAlert.showSuccess("Message " + response.data.MsgId + " successfully sent");
           })
           .catch(err => {
             console.error(err);
           });
       }.bind(this));
+    },
+    updateMessage: function(item, next){
+      this.axios
+        .post(`http://${this.ip}/api/message/${item.MsgId}`, JSON.stringify(item))
+        .then(res => {
+          this.updateModel
+    (res.data);
+          if(next)
+            next(null,res.data);
+          this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
+        })
+        .catch(res => {
+          console.error(res);
+          next(res);
+        });
     },
     craftMessage: function(item, next){
       this.axios
@@ -191,28 +217,9 @@ export default {
             console.error(err);
           });
     },
-    updateMessage: function(item, next){
-      this.axios
-        .post(`http://${ip}/api/manager/${data.ClientId}/${direction}/${data.MsgId}/send`)
-        .then(res => {
-          var tmp = this.msg.filter(m => m.MsgId == res.MsgId)
-          if (tmp){
-            this.msg[this.msg.indexOf(tmp)] = res;
-          }else{
-            this.msg.push(res);
-          }
-          if(next)
-            next(null,res.data);
-          this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
-        })
-        .catch(res => {
-          console.error(res);
-          next(res);
-        });
-    },
     copyMessage: function(item){
       this.axios
-        .post(`http://${ip}/api/message/${item.MsgId}/copy`)
+        .post(`http://${this.ip}/api/message/${item.MsgId}/copy`)
         .then(res => {
           this.msg.push(res.data);
           this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
