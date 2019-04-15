@@ -62,7 +62,7 @@
                             </b-card-text>
                         </b-col>
                     </b-row>
-                    <b-button size="sm" @click="disconnect(key)" variant="danger">Force disconnect</b-button>
+                    <b-button size="sm" @click="disconnect(key)" class="client_remove_button" variant="danger">Force disconnect</b-button>
                 </b-card-body>
             </b-collapse>
             </b-card>
@@ -135,7 +135,7 @@ export default {
 </script>
 
 <style>
-.btn-danger{
+.client_remove_button{
     margin: 0 auto;
     display: block;
 }

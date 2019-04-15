@@ -24,8 +24,8 @@
       </b-row>
       <b-row>
         <b-col cols="12">
-          <b-button size="sm" variant="success">New Message</b-button>
-          <b-button size="sm" @click="this.msg = []" variant="warning" style="float:right;">Clear</b-button>
+          <b-button size="sm" variant="success"><i class="fas fa-plus-circle"></i></b-button>
+          <b-button size="sm" @click="clearMsg()" variant="warning" style="float:right;">Clear</b-button>
         </b-col>
       </b-row>
 
@@ -35,7 +35,8 @@
         <!--Button for editing area-->
         <template slot="show_details" slot-scope="row">
           <b-button size="sm" @click="row.toggleDetails" class="mr-2">
-            {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
+            <!--{{ row.detailsShowing ? 'Hide' : 'Show'}} Details-->
+            <i class="fas fa-info-circle"></i>
           </b-button>
           <b-button size="sm" @click="deleteMessage(row.item)" variant="danger"><i class="far fa-trash-alt"></i></b-button>
         </template>
@@ -53,8 +54,8 @@
             ></b-form-textarea>
             <b-button size="sm" @click="sendMessage(row.item, 'clientOut')" variant="primary">Send request</b-button>
             <b-button size="sm" @click="sendMessage(row.item, 'clientIn')" variant="primary">Send response</b-button>
-            <b-button size="sm" @click="updateMessage(row.item)" variant="info">Save</b-button>
-            <b-button size="sm" @click="copyMessage(row.item)" variant="warning">Copy</b-button>
+            <b-button size="sm" @click="updateMessage(row.item)" variant="info"><i class="fas fa-save"></i></b-button>
+            <b-button size="sm" @click="copyMessage(row.item)" variant="warning"><i class="far fa-copy"></i></b-button>
             <!--<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>-->
           </b-card>
         </template>
@@ -108,6 +109,9 @@ export default {
     this.$socket.send('some data');
   },
   methods: {
+    clearMsg: function(){
+      this.msg = [];
+    },
 	  processData: function(event) {
       var data = JSON.parse(event.data);
       this.updateModel(data);
