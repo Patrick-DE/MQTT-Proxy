@@ -97,6 +97,30 @@ namespace MQTT_Proxy.REST
             return context;
         }
 
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.DELETE, PathInfo = "/[msgId]")]
+        public IHttpContext DeleteMessage(IHttpContext context)
+        {
+#if DEBUG
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
+#endif
+            var isNumber = int.TryParse(context.Request.PathParameters["msgId"], out int msgId);
+            if (isNumber)
+            {
+                MQTTProxyMessage msg = Broker.db.messageList.FirstOrDefault(elem => elem.MsgId == msgId);
+                if (msg != null)
+                {
+                    Broker.db.messageList.Remove(msg);
+                    context.Response.SendJSON(msg);
+                }
+                else
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "There is no message associated with this msgId");
+            }
+            else
+                context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
+            return context;
+        }
+
         [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.POST, PathInfo = "/[msgId]/copy")]
         public IHttpContext CopyMessage(IHttpContext context)
         {
@@ -118,5 +142,16 @@ namespace MQTT_Proxy.REST
                 context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.BadRequest, "Enter a valid msgId");
             return context;
         }
+
+#if DEBUG
+        [RestRoute(HttpMethod = Grapevine.Shared.HttpMethod.OPTIONS, PathInfo = "/[msgId]")]
+        public IHttpContext AddCORSHeader(IHttpContext context)
+        {
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            context.Response.Headers["Access-Control-Allow-Methods"] = "OPTIONS, HEAD, GET, DELETE, POST, PUT";
+            context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.Ok);
+            return context;
+        }
+#endif
     }
 }
