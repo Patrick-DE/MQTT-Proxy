@@ -194,8 +194,7 @@ export default {
       this.axios
         .post(`http://${this.ip}/api/message/${item.MsgId}`, JSON.stringify(item))
         .then(res => {
-          this.updateModel
-    (res.data);
+          this.updateModel(res.data);
           if(next)
             next(null,res.data);
           this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
@@ -211,6 +210,17 @@ export default {
         .then(res => {
           this.msg.push(res.data);
           this.$refs.yourMomGayAlert.showSuccess("Successfully saved");
+        })
+        .catch(res => {
+          console.error(res);
+        });
+    },
+    deleteMessage: function(item){
+      this.axios
+        .delete(`http://${this.ip}/api/message/${item.MsgId}`)
+        .then(res => {
+          this.msg.pop(res.data);
+          this.$refs.yourMomGayAlert.showSuccess("Successfully removed");
         })
         .catch(res => {
           console.error(res);
