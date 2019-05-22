@@ -1,5 +1,6 @@
 # MQTT-Proxy
-This software enables your to capture mqtt traffic and manipulate the content of the pakets.
+This software enables your to capture mqtt traffic and manipulate the content of the packets.
+A paper to this work is written in German and can be found here: [Bachelor Thesis](https://github.com/Patrick-DE/Konzeption-und-Entwicklung-eines-MQTT-Proxies-f-r-Security-Assesments)
 
 ## Configuration
 - Default Broker: 127.0.0.1:1883
