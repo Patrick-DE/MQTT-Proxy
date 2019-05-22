@@ -14,7 +14,7 @@ namespace MQTT_Proxy
         static void Main(string[] args)
         {
             //"String ownIP, int ownPort, String targetIP, int targetPort"
-            args = new string[] { "192.168.1.21", "1883", "192.169.178.120", "1883" };
+            args = new string[] { "127.0.0.1", "1883", "192.169.178.120", "1883" };
             /*args[0] = Dns.GetHostEntry(Dns.GetHostName())
                 .AddressList
                 .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
@@ -31,15 +31,15 @@ namespace MQTT_Proxy
             ProxyConfig proxyConfig = new ProxyConfig(args[0], int.Parse(args[1]), args[2], int.Parse(args[3]));
             var broker = new Broker(proxyConfig);
             broker.Start();
-            //DUMMY SHIT!!
-            /*
+            //DUMMY Data!!
+            
             Random rnd = new Random();
             for (int i=0; i< 10; i++)
             {
                 MqttApplicationMessage msg = new MqttApplicationMessage();
                 msg.QualityOfServiceLevel = MQTTnet.Protocol.MqttQualityOfServiceLevel.AtMostOnce;
-                msg.Payload = Encoding.UTF8.GetBytes("YourMomGay" + rnd.Next(0, 1000));
-                msg.Topic = "YourMomDoubleGay";
+                msg.Payload = Encoding.UTF8.GetBytes("Test" + rnd.Next(0, 1000));
+                msg.Topic = "Data/Test";
                 msg.Retain = false;
                 if (i == 0)
                 {
@@ -53,7 +53,7 @@ namespace MQTT_Proxy
                     Broker.clientManagers.Add(clientId, new ClientManager(clientId, proxyConfig));
                 }
             } 
-            */
+            
             //END DUMMY SHIT!!
 
             var rest = new RestServer

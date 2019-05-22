@@ -85,7 +85,6 @@
     <Compile Include="ClientOut.cs" />
     <Compile Include="ProxyConfig.cs" />
     <Compile Include="REST\Manager.cs" />
-    <Compile Include="REST\Authentication.cs" />
     <Compile Include="REST\ClientManagerWithMessages.cs" />
     <Compile Include="REST\Intercepter.cs" />
     <Compile Include="REST\Message.cs" />
