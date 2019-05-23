@@ -13,12 +13,12 @@ namespace MQTT_Proxy
         public String targetIP;
         public int targetPort;
 
-        public ProxyConfig(String ownIP, int ownPort, String targetIP, int targetPort)
+        public ProxyConfig(String targetIP, int targetPort, String ownIP, int ownPort)
         {
-            this.ownIP = ownIP;
-            this.ownPort = ownPort;
             this.targetIP = targetIP;
             this.targetPort = targetPort;
+            this.ownIP = ownIP;
+            this.ownPort = ownPort;
         }
     }
 }
