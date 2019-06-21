@@ -81,7 +81,7 @@ namespace MQTT_Proxy
             {
                 //RULEBOOK
                 string payload = Encoding.UTF8.GetString(context.ApplicationMessage.Payload);
-                Policy myPolicy = Broker.policyManager.rulebook.First();
+                Policy myPolicy = Broker.policyManager.rulebook.Last();
                 bool isNumber = int.TryParse(payload, out int payloadInt);
                 if (isNumber)
                 {
