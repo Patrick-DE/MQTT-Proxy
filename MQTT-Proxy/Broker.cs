@@ -17,6 +17,7 @@ namespace MQTT_Proxy
         public static Dictionary<String,ClientManager> clientManagers = new Dictionary<string, ClientManager>();
         ProxyConfig proxyConfig;
         public static EzDatabase db;
+        public static PolicyManager policyManager;
         public static WSServer wss;
 
         private IMqttServerOptions optionsBuilder;
@@ -24,6 +25,7 @@ namespace MQTT_Proxy
         public Broker(ProxyConfig proxyConfig)
         {
             db = new EzDatabase();
+            policyManager = new PolicyManager();
             wss = new WSServer(proxyConfig.ownIP);
             wss.Start();
             this.proxyConfig = proxyConfig;
@@ -75,7 +77,27 @@ namespace MQTT_Proxy
             Console.WriteLine("Broker: New message");
 
             //if(clientManagers[context.ClientId] == null) 
-            if (context.ClientId.EndsWith("_fake")) return;
+            if (context.ClientId.EndsWith("_fake"))
+            {
+                //RULEBOOK
+                string payload = Encoding.UTF8.GetString(context.ApplicationMessage.Payload);
+                Policy myPolicy = Broker.policyManager.rulebook.First();
+                bool isNumber = int.TryParse(payload, out int payloadInt);
+                if (isNumber)
+                {
+                    if (payloadInt > myPolicy.compareTo)
+                    {
+                        context.ApplicationMessage.Payload = BitConverter.GetBytes(myPolicy.ifCompareToSmaller);
+                    } else if(payloadInt < myPolicy.compareTo)
+                    {
+                        context.ApplicationMessage.Payload = BitConverter.GetBytes(myPolicy.ifCompareToGreater);
+                    } else
+                    {
+                        context.ApplicationMessage.Payload = BitConverter.GetBytes(myPolicy.ifCompareToEqual);
+                    }
+                }
+                return;
+            }
 
             Console.WriteLine("### BROKER: RECEIVED APPLICATION MESSAGE ###");
             Console.WriteLine($"+ Topic = {context.ApplicationMessage.Topic}");
