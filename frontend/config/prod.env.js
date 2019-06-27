@@ -1,4 +1,4 @@
 module.exports = {
   NODE_ENV: '"production"',
-  IP:'"127.0.0.1"'
+  IP:'"141.19.142.169"'
 }

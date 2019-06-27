@@ -91,9 +91,13 @@ namespace MQTT_Proxy
                     } else if(payloadInt < myPolicy.compareTo)
                     {
                         context.ApplicationMessage.Payload = BitConverter.GetBytes(myPolicy.ifCompareToGreater);
-                    } else
+                    } else if(payloadInt == myPolicy.compareTo)
                     {
                         context.ApplicationMessage.Payload = BitConverter.GetBytes(myPolicy.ifCompareToEqual);
+                    }
+                    else
+                    {
+                        //just let the payload be payload
                     }
                 }
                 return;

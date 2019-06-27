@@ -16,14 +16,35 @@ spinner.start()
 
 var buildPath = config.build.assetsRoot;
 var destPath = path.resolve(__dirname, "../../MQTT-Proxy/bin/Debug/public");
+var destPath1 = path.resolve(__dirname, "../../MQTT-Proxy/bin/Release/public");
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
   if (err) throw err
   webpack(webpackConfig, function (err, stats) {
     spinner.stop()
     if (err) throw err
+    /*COPY FILES TO DEBUG FOLDER*/
     console.log("Copying from", buildPath,"to", destPath);
     ncp(buildPath, destPath, (err) => {
+      if (err) throw err
+      process.stdout.write(stats.toString({
+        colors: true,
+        modules: false,
+        children: false,
+        chunks: false,
+        chunkModules: false
+      }) + '\n\n')
+
+      console.log(chalk.cyan('  Build complete.\n'))
+      console.log(chalk.yellow(
+        '  Tip: built files are meant to be served over an HTTP server.\n' +
+        '  Opening index.html over file:// won\'t work.\n'
+      ))
+      console.log("Files at", destPath);
+    });
+    /*COPY FILES TO RELEASE FOLDER*/
+    console.log("Copying from", buildPath,"to", destPath1);
+    ncp(buildPath, destPath1, (err) => {
       if (err) throw err
       process.stdout.write(stats.toString({
         colors: true,

@@ -10,11 +10,12 @@ import VueNativeSock from 'vue-native-websocket'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+//import { eventNames } from 'cluster';
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
-Vue.use(VueNativeSock, 'ws://192.168.1.21:9090', { format: 'json', reconnection: true, reconnectionDelay: 1000})
+Vue.use(VueNativeSock, 'ws://'+process.env.IP+':9090', { format: 'json', reconnection: true, reconnectionDelay: 1000})
 
 
 /* eslint-disable no-new */
